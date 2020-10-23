@@ -737,16 +737,11 @@ function init() {
     window.addEventListener("resize", () => {
       let currentTime = Date.now();
       lastResize = currentTime;
-      console.log("Resize fired");
       setTimeout(() => {
         if (currentTime == lastResize) {
-          const startTime = Date.now();
           kinklist.updateColumns();
-          const endTime = Date.now();
-          console.log(`updateColumns(): ${endTime - startTime}`);
-          console.log("Updating columns");
         }
-      }, 300)
+      }, 150)
     })
   })()
 
