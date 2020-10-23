@@ -458,6 +458,12 @@ class KinklistCanvasDrawer {
                                      {width: width, height: height});
     canvas.height = height;
     canvas.width = width;
+    canvas.addEventListener("click", () => {
+    	let anchor = document.createElement("a");
+    	anchor.href = canvas.toDataURL();
+    	anchor.download = `Kinklist (${this.username}).png`;
+    	anchor.click();
+    })
     return canvas;
   }
   createContext(canvas = this.canvas) {

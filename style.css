@@ -48,6 +48,9 @@ td {
 td + td {
   border-left-style: none;
 }
+canvas {
+  cursor: pointer;
+}
 .hidden {
   opacity: 0;
   position: absolute;
