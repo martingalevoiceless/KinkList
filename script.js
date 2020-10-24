@@ -759,15 +759,18 @@ function init() {
   editTextareaElement.value = kinklist.settings.kinklistText;
 
   exportElement.addEventListener("mousedown", () => {
-    const nickname = window.prompt("Enter nickname:", "Anonymous");
-    if (nickname) {
-      const kinklistCanvasDrawer = new KinklistCanvasDrawer(kinklist, nickname);
+    const username =
+    		window.prompt("Enter nickname:", kinklist.settings.username);
+    if (username) {
+    	kinklist.settings.username = username;
+      const kinklistCanvasDrawer = new KinklistCanvasDrawer(kinklist, username);
       kinklistCanvasDrawer.drawKinklist();
-      const legendElement = document.querySelector("div.legend");
+      const inputListElement = document.querySelector("#InputList");
       if (document.querySelector("canvas")) {
-        document.querySelector("canvas").replaceWith(kinklistCanvasDrawer.canvas);
+        document.querySelector("canvas")
+        		.replaceWith(kinklistCanvasDrawer.canvas);
       } else {
-        legendElement.append(kinklistCanvasDrawer.canvas);
+        inputListElement.before(kinklistCanvasDrawer.canvas);
       }
     }
   });
