@@ -50,6 +50,8 @@ td + td {
 }
 canvas {
   cursor: pointer;
+  width: 100%;
+  margin-top: 1em;
 }
 .hidden {
   opacity: 0;
