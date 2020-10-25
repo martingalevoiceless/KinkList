@@ -83,11 +83,12 @@ const defaultSettings = {
 
 
 class SelectionOption {
-  constructor(name, color) {
+  constructor(name, color, selection) {
     this.name = name;
     this.cssClassName = toCSSClassName(name);
     this.color = color;
     this.element = this.createElement();
+    this.selection = selection;
   }
 
   createElement() {
@@ -101,12 +102,12 @@ class SelectionOption {
 }
 
 class Selection {
-  constructor(selectionOptions) {
-    // Selection.selectionOptions are created in Kinklist constructor.
+  constructor(selectionOptions, kink) {
     this.options = selectionOptions.slice()
-                   .map(option => new SelectionOption(...option));
+                   .map(option => new SelectionOption(...option, this));
     this.value = this.options[0];
     this.element = this.createElement();
+    this.kink = kink;
   }
 
   createElement() {
@@ -131,15 +132,16 @@ class Selection {
 }
 
 class Kink {
-  constructor(name, columnAmount, selectionOptions) {
+  constructor(name, columnAmount, selectionOptions, category) {
     this.name = name;
     this.cssClassName = `kink-${toCSSClassName(name)}`;
     this.columnAmount = columnAmount || 1;
     //this.description = description;
     this.selections = [];
     for (let i = 0; i < this.columnAmount; i++)
-      this.selections.push(new Selection(selectionOptions));
+      this.selections.push(new Selection(selectionOptions, this));
     this.element = this.createRowElement();
+    this.category = category;
   }
 
   createRowElement() {
@@ -151,16 +153,23 @@ class Kink {
                                     {class: `kinkRow ${this.cssClassName}`});
     return element;
   }
+
+  link(category) {
+  	this.category = category;
+  	return this;
+  }
 }
 
 class Category {
-  constructor(name, columnNames, kinks) {
+  constructor(name, columnNames, kinks, kinklist) {
     this.name = name;
     this.columnNames = columnNames;
     this.kinks = kinks || [];
+    this.linkKinks();
     this.tableElement = this.createTableElement();
     this.element = this.createDivElement();
     this.height = this.kinks.length ? this.updateHeight() : 0;
+    this.kinklist = kinklist;
   }
 
   createTableElement() {
@@ -185,7 +194,7 @@ class Category {
   }
 
   addKink(kink) {
-    this.kinks.push(kink);
+    this.kinks.push(kink.link(this));
     this.tableElement.querySelector("tbody").append(kink.element);
   }
 
@@ -215,6 +224,21 @@ class Category {
     }
     this.height = height;
     return height;
+  }
+
+  get kinks() {
+  	return this._kinks;
+  }
+
+  set kinks(kinkObjects) {
+  	this._kinks = kinkObjects;
+  	this.linkKinks();
+  }
+
+  linkKinks() {
+  	for (let kink of this.kinks) {
+  		kink.category = this;
+  	}
   }
 }
 
@@ -342,7 +366,7 @@ class Kinklist {
         extraCategories.delete(existingCategory);
       }
       else
-        newCategories.push(new Category(newCategoryName, columns, kinks));
+        newCategories.push(new Category(newCategoryName, columns, kinks, this));
     })
     if (extraCategories) this.removeCategory(...extraCategories);
     if (newCategories) this.appendCategory(...newCategories);
