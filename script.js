@@ -85,10 +85,13 @@ const defaultSettings = {
 class SelectionOption {
   constructor(name, color, selection) {
     this.name = name;
-    this.cssClassName = toCSSClassName(name);
     this.color = color;
     this.element = this.createElement();
     this.selection = selection;
+  }
+
+  get cssClassName() {
+  	return toCSSClassName(this.name);
   }
 
   createElement() {
@@ -125,8 +128,8 @@ class Selection {
     this.value = value || this.value;
     this.element.childNodes
                     .forEach(option => {option.classList.remove("selected")});
-    const option = this.element
-                          .querySelector('.' + toCSSClassName(this.value.name));
+    const option =
+    		this.element.querySelector(`.${toCSSClassName(this.value.name)}`);
     option.classList.add("selected");
   }
 }
