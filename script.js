@@ -755,6 +755,7 @@ function generateLegend(selectionOptions) {
     return optionDiv;
   })
   const legendElement = document.querySelector('.legend');
+  removeInnerNodes(legendElement);
   legendElement.append(...legendOptionElements);
 }
 
