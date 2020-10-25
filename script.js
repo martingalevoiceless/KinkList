@@ -130,7 +130,15 @@ class Selection {
   }
 
   updateSelection(value) {
-    this.value = value || this.value;
+  	if (typeof value == "number") {
+  		if (value < 0 || value >= this.options.length) {
+  			value = 0;
+  			console.error("Selection value out of bounds!");
+  		}
+  		this.value = this.options[value];
+  	} else {
+	    this.value = value || this.value;
+  	}
     this.element.childNodes
                     .forEach(option => {option.classList.remove("selected")});
     const option =
