@@ -102,6 +102,11 @@ class SelectionOption {
   get cssRule() {
     return `.choice.${this.cssClassName} {background-color: ${this.color};}`
   }
+
+  equals(selectionOption) {
+  	return (this.name == selectionOption.name) &&
+  				 (this.color == selectionOption.color);
+  }
 }
 
 class Selection {
@@ -131,6 +136,12 @@ class Selection {
     const option =
     		this.element.querySelector(`.${toCSSClassName(this.value.name)}`);
     option.classList.add("selected");
+  }
+
+  equals(selection) {
+  	return (this.options.length == selection.options.length) &&
+  				 (this.options.every((option, index) =>
+  				                     option.equals(selection.options[index])));
   }
 }
 
