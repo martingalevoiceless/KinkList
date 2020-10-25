@@ -1,3 +1,5 @@
+"use strict";
+
 function createHTMLElement(tag, inner, attributes) {
   const element = document.createElement(tag);
   if (inner != undefined) {
