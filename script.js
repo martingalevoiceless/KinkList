@@ -118,6 +118,17 @@ class Selection {
     this.kink = kink;
   }
 
+  get columnName() {
+  	const kink = this.kink;
+  	const category = kink.category;
+  	let columnName = '';
+  	if (category.columnNames.length > 1) {
+  		columnName = category.columnNames[kink.selections
+  																			.findIndex(x => x == this)];
+  	}
+  	return columnName;
+  }
+
   createElement() {
     const buttonElements = this.options.map(option => option.element);
     for (let i = 0; i < this.options.length; i++) {
@@ -722,16 +733,180 @@ class KinklistCanvasDrawer {
   }
 }
 
+
+
 class Carousel {
   constructor(kinklistObject, carouselElement) {
     this.kinklist = kinklistObject;
     this.rootElement = carouselElement
                        || document.querySelector("#InputOverlay .widthWrapper");
-    this
+    this.enabled = true;
+    this.initialize(); // this.selections, this.index;
+  }
+
+  get selection() {
+  	return this.selections[this.index];
+  }
+
+  moveIndexForward(amount = 1) {
+  	this.previousSelection = this.selection;
+    this.index = this.nextIndex(amount);
+    this.update();
+  }
+
+  moveIndexBackward(amount = 1) {
+  	this.previousSelection = this.selection;
+    this.index = this.previousIndex(amount);
+    this.update();
+  }
+
+  nextIndex(amount = 1) {
+  	return (this.index + amount) % this.selections.length;
+  }
+
+  previousIndex(amount = 1) {
+    return (this.index - amount + this.selections.length) %
+    				this.selections.length;
+  }
+
+  select(optionNumber) {
+  	this.selections[this.index].updateSelection(optionNumber);
+  	this.moveIndexForward();
+  }
+
+  update() {
+  	this.updateSurroundingInputElements();
+  	if (!this.selection.equals(this.previousSelection)) {
+  		this.updateInputValues(this.selection);
+  	}
+  	this.updateInputCurrentElementState();
   }
 
   refresh() {
-    
+  	this.selections =
+  			[].concat(...this.kinklist.kinks.map(kink => kink.selections));
+  	const oldIndex = this.index || 0;
+  	this.index =
+  			this.selections.findIndex(selection =>
+  			                          selection.value.name == "Not Entered");
+  	if (this.index == -1) this.index = oldIndex;
+  	this.previousSelection = this.selection;
+  	this.enabled = true;
+  }
+
+  initialize() {
+  	this.refresh();
+  	this.updateInputValues(this.selection);
+  	this.update();
+  }
+
+  createInputValues(selection) {
+  	const bigChoiceDivElements = [];
+  	for (let i = 0; i < selection.options.length; i++) {
+  		const option = selection.options[i];
+	  	const circleElement =
+	  			createHTMLElement("span", '',
+	  			                  {class: `choice ${option.cssClassName}`});
+	  	const nameElement =
+	  			createHTMLElement("span", option.name, {class: "legend-text"});
+	  	const buttonNumberTextElement =
+	  			createHTMLElement("span", i, {class: "btn-num-text"});
+	  	const bigChoiceDivElement =
+	  			createHTMLElement("div",
+	  			                  [circleElement,
+	  			                  	nameElement,
+	  			                  	buttonNumberTextElement],
+	  			                  {class: "big-choice"});
+	  	if (selection.value == option) {
+	  		bigChoiceDivElement.classList.add("selected");
+	  	}
+
+	  	bigChoiceDivElement.addEventListener("mousedown", () => {
+	  		this.select(i);
+	  	})
+
+	  	bigChoiceDivElements.push(bigChoiceDivElement);
+  	}
+  	return bigChoiceDivElements;
+  }
+
+  updateInputValues(selection) {
+  	const inputValuesElement = this.rootElement.querySelector("#InputValues");
+  	removeInnerNodes(inputValuesElement);
+  	inputValuesElement.append(...this.createInputValues(selection));
+  }
+
+  updateInputCurrentElementState(selection = this.selection) {
+  	const kink = selection.kink;
+  	const category = kink.category;
+  	this.rootElement.querySelector("#InputCategory").textContent =
+  			category.name;
+  	this.rootElement.querySelector("#InputField").textContent =
+  			(selection.columnName ? `(${selection.columnName}) ` : '') + kink.name;
+  	const selectedElement = this.rootElement.querySelector(".selected");
+  	if (selectedElement) selectedElement.classList.remove("selected");
+  	const newSelectedElement =
+  			this.rootElement.querySelector(`#InputCurrent .${selection.value.cssClassName}`)
+  					.parentElement;
+  	newSelectedElement.classList.add("selected");
+  }
+
+  updateInputPreviousElement() {
+  	const kinkSimpleDivElements = [];
+  	for (let i = 3; i > 0; i--) {
+  		const selection = this.selections[this.previousIndex(i)];
+  		const kinkSimpleDivElement = this.createKinkSimpleDivElement(selection);
+			kinkSimpleDivElement.addEventListener("mousedown", () => {
+				this.moveIndexBackward(i);
+			});
+  		kinkSimpleDivElements.push(kinkSimpleDivElement);
+  	}
+  	const inputPreviousElement = this.rootElement.querySelector("#InputPrevious");
+  	removeInnerNodes(inputPreviousElement);
+  	inputPreviousElement.append(...kinkSimpleDivElements);
+  }
+
+  updateInputNextElement() {
+  	const kinkSimpleDivElements = [];
+  	for (let i = 1; i <= 3; i++) {
+  		const selection = this.selections[this.nextIndex(i)];
+  		const kinkSimpleDivElement = this.createKinkSimpleDivElement(selection);
+			kinkSimpleDivElement.addEventListener("mousedown", () => {
+				this.moveIndexForward(i);
+			});
+  		kinkSimpleDivElements.push(kinkSimpleDivElement);
+  	}
+  	const inputNextElement = this.rootElement.querySelector("#InputNext");
+  	removeInnerNodes(inputNextElement);
+  	inputNextElement.append(...kinkSimpleDivElements);
+  }
+
+  updateSurroundingInputElements() {
+  	this.updateInputPreviousElement();
+  	this.updateInputNextElement();
+  }
+
+  createKinkSimpleDivElement(selection) {
+		const categoryName = selection.kink.category.name;
+		const columnName = selection.columnName;
+		const kinkName = selection.kink.name;
+		const choiceElement =
+				createHTMLElement("span", '', 
+				                  {class: `choice ${selection.value.cssClassName}`});
+		const txtCategoryElement =
+				createHTMLElement("span", categoryName, {class: "txt-category"});
+		const txtFieldElement =
+				createHTMLElement("span", columnName, {class: "txt-field"});
+		const txtKinkElement =
+				createHTMLElement("span", kinkName, {class: "txt-kink"});
+		const kinkSimpleDivElement =
+				createHTMLElement("div",
+				                  [choiceElement,
+				                  	txtCategoryElement,
+				                  	txtFieldElement,
+				                  	txtKinkElement],
+				                  {class: "kink-simple"});
+		return kinkSimpleDivElement;
   }
 }
 
@@ -829,17 +1004,28 @@ function init() {
     const startButtonElement = document.getElementById("StartBtn");
     const inputOverlayElement = document.getElementById("InputOverlay");
     const closePopupButtonElement = document.querySelector(".closePopup");
-    const carousel = new Carousel(kinklist);
+    let carousel;
 
     startButtonElement.addEventListener("mousedown", () => {
-      carousel.refresh();
+      if (!carousel) {
+      	carousel = new Carousel(kinklist);
+      } else {
+	      carousel.refresh();
+	      carousel.update();
+      }
       fadeIn(inputOverlayElement);
     });
-    inputOverlayElement.addEventListener("mousedown", () => {
+    const inputFadeOutHandler = function() {
       fadeOut(inputOverlayElement);
-    });
-    closePopupButtonElement.addEventListener("mousedown", () => {
-      fadeOut(inputOverlayElement);
+      carousel.enabled = false;
+    }
+    inputOverlayElement.addEventListener("mousedown", inputFadeOutHandler);
+    closePopupButtonElement.addEventListener("mousedown", inputFadeOutHandler);
+    document.addEventListener("keydown", (pressed) => {
+    	if (carousel && carousel.enabled && Number.isInteger(+pressed.key)
+    	    && pressed.key < carousel.selection.options.length) {
+    		carousel.select(+pressed.key);
+    	}
     });
   })()
 
