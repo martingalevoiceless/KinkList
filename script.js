@@ -508,6 +508,10 @@ class KinklistCanvasDrawer {
     this.context = this.createContext(this.canvas);
   }
 
+  get filename() {
+  	return `Kinklist (${this.username}).png`;
+  }
+
   createCanvas(height = this.settings.canvas.height,
                width = this.settings.canvas.width) {
     const canvas = createHTMLElement("canvas", null,
@@ -517,7 +521,7 @@ class KinklistCanvasDrawer {
     canvas.addEventListener("click", () => {
     	let anchor = document.createElement("a");
     	anchor.href = canvas.toDataURL();
-    	anchor.download = `Kinklist (${this.username}).png`;
+    	anchor.download = this.filename;
     	anchor.click();
     })
     return canvas;
