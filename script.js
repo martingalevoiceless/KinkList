@@ -310,7 +310,8 @@ class Kinklist {
   appendCategory(...categories) {
     for (let category of categories) {
       this.categories.push(category);
-      const newKinks = category.kinks.filter(kink => !this.kinks.includes(kink));
+      const newKinks =
+      		category.kinks.filter(kink => !this.kinks.includes(kink));
       this.kinks.push(...newKinks); 
     }
   }
@@ -325,10 +326,6 @@ class Kinklist {
             .filter(category => !categoriesToRemove.includes(category));
     this.kinks = [].concat(...this.categories.map(category => category.kinks));
     this.hasCategoriesChanged = true;
-  }
-
-  flush() {
-
   }
  
   parseKinklistSettings(inputString) {
