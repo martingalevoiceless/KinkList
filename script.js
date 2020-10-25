@@ -653,6 +653,9 @@ class KinklistCanvasDrawer {
                        + font.title.size;
     context.canvas.height = canvasHeight;
 
+    context.fillStyle = "white";
+    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+
     let x = margins.left;
     let y = margins.top;
 
