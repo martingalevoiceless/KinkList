@@ -515,7 +515,8 @@ class KinklistCanvasDrawer {
   createCanvas(height = this.settings.canvas.height,
                width = this.settings.canvas.width) {
     const canvas = createHTMLElement("canvas", null,
-                                     {width: width, height: height});
+                                     {width: width, height: height,
+                                      id: "KinklistCanvas"});
     canvas.height = height;
     canvas.width = width;
     canvas.addEventListener("click", () => {
@@ -947,6 +948,37 @@ function generateSelectionOptionCSS(selectionOptions) {
   selectionOptions.forEach(option => appendCSSRuleToStylesheet(option.cssRule));
 }
 
+function uploadToImgur(blob, filename) {
+  return new Promise((resolve, reject) => {
+    const data = new FormData();
+    data.append("image", blob);
+    data.append("type", "file");
+    data.append("name", filename);
+
+    const xhr = new XMLHttpRequest();
+
+    xhr.addEventListener("load", function() {
+      resolve(JSON.parse(this.responseText));
+    });
+
+    xhr.addEventListener("error", function() {
+      console.error("Error");
+      reject(this);
+    })
+
+    xhr.addEventListener("timeout", function() {
+      console.error("Timeout");
+      reject(this);
+    })
+
+    xhr.open("POST", "https://api.imgur.com/3/image");
+    xhr.setRequestHeader("Authorization", "Client-ID 546c25a59c58ad7");
+    xhr.setRequestHeader("Accept", "application/json");
+
+    xhr.send(data);
+  });
+}
+
 
 
 function init() {
@@ -956,7 +988,7 @@ function init() {
       .selectionOptions.map(option => new SelectionOption(...option));
   generateLegend(selectionOptionObjects);
   generateSelectionOptionCSS(selectionOptionObjects);
-  appendCSSRuleToStylesheet("canvas{border:solid 1px black");
+  appendCSSRuleToStylesheet("#KinklistCanvas{border:solid 1px black}");
 
 
 
@@ -974,74 +1006,107 @@ function init() {
   })()
 
   const exportElement = document.getElementById("Export");
+  const generateElement = document.getElementById("Generate");
+  const urlElement = document.getElementById("URL");
+  const loadingElement = document.getElementById("Loading");
   const editToggleElement = document.getElementById("Edit");
   const editOverlayElement = document.getElementById("EditOverlay");
   const editOKButtonElement = document.getElementById("KinksOK");
   const editTextareaElement = document.getElementById("Kinks");
+  const startButtonElement = document.getElementById("StartBtn");
+  const inputOverlayElement = document.getElementById("InputOverlay");
+  const closePopupButtonElement = document.querySelector(".closePopup");
 
   editTextareaElement.value = kinklist.settings.kinklistText;
 
-  exportElement.addEventListener("mousedown", () => {
+  // Shared variables for following event handlers.
+  let kinklistCanvasDrawer;
+  let carousel;
+
+  async function exportEventHandler() {
+    if (kinklistCanvasDrawer) {
+      urlElement.style.display = "none";
+      loadingElement.style.display = "block";
+      const blob = await new Promise((res, rej) => {
+        kinklistCanvasDrawer.canvas.toBlob(blob => res(blob));
+      });
+      const filename = kinklistCanvasDrawer.filename;
+      uploadToImgur(blob, filename)
+        .then(result => {
+          console.log(result);
+          loadingElement.style.display = "none";
+          urlElement.value = result.data.link;
+          urlElement.style.display = "block";
+        })
+        .catch(error => {
+          console.error(error);
+          loadingElement.style.display = "none";
+        });
+    }
+  }
+  function generateEventHandler() {
     const username =
-    		window.prompt("Enter nickname:", kinklist.settings.username);
+        window.prompt("Enter nickname:", kinklist.settings.username);
     if (username) {
-    	kinklist.settings.username = username;
-      const kinklistCanvasDrawer = new KinklistCanvasDrawer(kinklist, username);
+      kinklist.settings.username = username;
+      kinklistCanvasDrawer = new KinklistCanvasDrawer(kinklist, username);
       kinklistCanvasDrawer.drawKinklist();
-      const inputListElement = document.querySelector("#InputList");
-      if (document.querySelector("canvas")) {
-        document.querySelector("canvas")
-        		.replaceWith(kinklistCanvasDrawer.canvas);
+      const canvasElement = document.querySelector("#KinklistCanvas");
+      if (canvasElement) {
+        canvasElement.replaceWith(kinklistCanvasDrawer.canvas);
       } else {
+        const inputListElement = document.querySelector("#InputList");
         inputListElement.before(kinklistCanvasDrawer.canvas);
       }
-    }
-  });
-  editToggleElement.addEventListener("mousedown", () => {
-    fadeIn(editOverlayElement)
-  });
-  editOverlayElement.addEventListener("mousedown", () => {
+      if (!exportElement.style.display) fadeIn(exportElement);
+    } 
+  }
+  function editToggleEventHandler() {
+    fadeIn(editOverlayElement);
+  }
+  function editOverlayEventHandler() {
     fadeOut(editOverlayElement)
-  });
-  editOKButtonElement.addEventListener("mousedown", () => {
+  }
+  function editOKButtonEventHandler() {
     editOKButtonElement.disabled = true;
     kinklist.parseKinklistSettings(editTextareaElement.value);
     fadeOut(editOverlayElement)
     editOKButtonElement.disabled = false;
-  });
-  (() => {
-    const startButtonElement = document.getElementById("StartBtn");
-    const inputOverlayElement = document.getElementById("InputOverlay");
-    const closePopupButtonElement = document.querySelector(".closePopup");
-    let carousel;
-
-    startButtonElement.addEventListener("mousedown", () => {
-      if (!carousel) {
-      	carousel = new Carousel(kinklist);
-      } else {
-	      carousel.refresh();
-	      carousel.update();
-      }
-      fadeIn(inputOverlayElement);
-    });
-    const inputFadeOutHandler = function() {
-      fadeOut(inputOverlayElement);
-      carousel.enabled = false;
+  }
+  function startButtonEventHandler() {
+    if (!carousel) {
+      carousel = new Carousel(kinklist);
+    } else {
+      carousel.refresh();
+      carousel.update();
     }
-    inputOverlayElement.addEventListener("mousedown", inputFadeOutHandler);
-    closePopupButtonElement.addEventListener("mousedown", inputFadeOutHandler);
-    document.addEventListener("keydown", (pressed) => {
-    	if (carousel && carousel.enabled && Number.isInteger(+pressed.key)
-    	    && pressed.key < carousel.selection.options.length) {
-    		carousel.select(+pressed.key);
-    	}
-    });
-  })()
+    fadeIn(inputOverlayElement);
+  }
+  function inputFadeOutHandler() {
+    fadeOut(inputOverlayElement);
+    carousel.enabled = false;
+  }
+  function keyboardEventHandler(pressed) {
+    if (carousel && carousel.enabled && Number.isInteger(+pressed.key)
+        && pressed.key < carousel.selection.options.length) {
+      carousel.select(+pressed.key);
+    }
+  }
+  function dontPropagate(e) {
+    e.stopPropagation();
+  }
 
+  generateElement.addEventListener("mousedown", generateEventHandler);
+  exportElement.addEventListener("mousedown", exportEventHandler)
+  editToggleElement.addEventListener("mousedown", editToggleEventHandler);
+  editOverlayElement.addEventListener("mousedown", editOverlayEventHandler);
+  editOKButtonElement.addEventListener("mousedown", editOKButtonEventHandler);
+  startButtonElement.addEventListener("mousedown", startButtonEventHandler);
+  inputOverlayElement.addEventListener("mousedown", inputFadeOutHandler);
+  closePopupButtonElement.addEventListener("mousedown", inputFadeOutHandler);
+  document.addEventListener("keydown", keyboardEventHandler);
   document.querySelectorAll(".overlay > *")
-      .forEach(element => element.addEventListener("mousedown",
-                                                   (e) => e.stopPropagation()
-                                                  ));
+      .forEach(element => element.addEventListener("mousedown", dontPropagate));
 }
 
 if (document.readyState === 'loading') { 

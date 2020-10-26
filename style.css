@@ -104,7 +104,7 @@ canvas {
 }
 
 #ExportWrapper {
-  width: 460px;
+  width: 600px;
   height: 36px;
 }
 #URL {
@@ -112,32 +112,39 @@ canvas {
   position: absolute;
   top: 3px;
   box-sizing: border-box;
-  width: 300px;
+  width: 270px;
   height: 30px;
   border-radius: 4px;
   border: solid #CCC 1px;
-  font-size: 16px;
+  font-size: 14px;
   padding: 10px;
   text-align: center;
   color: #666;
   font-weight: bold;
 }
-#Export {
+#Generate, #Export {
   position: absolute;
-  left: 310px;
   box-sizing: border-box;
   color: #FFF;
   text-transform: uppercase;
   background-color: #4980ae;
   font-size: 18px;
-  width: 150px;
   height: 36px;
   border-style: none;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
 }
-#Export:hover {
+#Generate {
+  left: 480px;
+  width: 120px;
+}
+#Export {
+  display: none;
+  left: 275px;
+  width: 200px;
+}
+#Generate:hover, #Export:hover {
   opacity: 0.85;
 }
 #Loading {
@@ -148,8 +155,8 @@ canvas {
   color: #999;
   font-weight: bold;
   position: absolute;
-  top: 4px;
-  left: 220px;
+  top: 5px;
+  left: 120px;
 }
 #Loading:before {
   content: '';
@@ -194,7 +201,7 @@ canvas {
     right: 46px;
   }
 }
-@media (max-width: 800px) and (min-width: 598px) {
+@media (max-width: 799px) and (min-width: 598px) {
   .legend div {
     width: 180px;
     padding-bottom: 10px;
@@ -202,19 +209,23 @@ canvas {
   }
   #ExportWrapper {
     position: relative;
+    height: 76px;
     margin-top: 10px;
     margin-left: 5px;
   }
   #URL {
-    left: 155px;
-    width: 190px;
-    font-size: 10px;
+    top: 40px;
+    width: 325px;
   }
-  #Export {
+  #Generate {
     left: 0px;
   }
+  #Export {
+    left: 125px;
+  }
   #Loading {
-    left: 230px;
+    top: 42px;
+    left: 143px;
   }
 }
 @media (max-width: 597px) {
@@ -234,17 +245,21 @@ canvas {
     margin-top: 10px;
     margin-left: 0px;
     width: 345px;
+    height: 76px;
   }
   #URL {
-    left: 155px;
-    width: 190px;
-    font-size: 10px;
+    top: 40px;
+    width: 325px;
   }
-  #Export {
+  #Generate {
     left: 0px;
   }
+  #Export {
+    left: 125px;
+  }
   #Loading {
-    left: 230px;
+    top: 42px;
+    left: 143px;
   }
 }
 @keyframes spin {
