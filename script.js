@@ -850,8 +850,8 @@ class Carousel {
   	const category = kink.category;
   	this.rootElement.querySelector("#InputCategory").textContent =
   			category.name;
-  	this.rootElement.querySelector("#InputField").textContent =
-  			(selection.columnName ? `(${selection.columnName}) ` : '') + kink.name;
+  	this.rootElement.querySelector("#InputField").textContent = kink.name;
+  	this.rootElement.querySelector("#InputColumn").textContent = selection.columnName;
   	const selectedElement = this.rootElement.querySelector(".selected");
   	if (selectedElement) selectedElement.classList.remove("selected");
   	const newSelectedElement =

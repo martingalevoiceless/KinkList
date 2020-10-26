@@ -458,6 +458,25 @@ canvas {
   margin-top: 3px;
   margin-bottom: 0;
   font-size: 14px;
+  display: inline;
+}
+#InputOverlay .widthWrapper #InputCurrent #InputColumn {
+  text-transform: uppercase;
+  color: #6C6C6C;
+  font-size: 12px;
+  margin-left: 2px;
+}
+#InputOverlay .widthWrapper #InputCurrent #InputColumn:before {
+  content: "(";
+}
+#InputOverlay .widthWrapper #InputCurrent #InputColumn:after {
+  content: ")";
+}
+#InputOverlay .widthWrapper #InputCurrent #InputColumn:empty:before {
+  content: "";
+}
+#InputOverlay .widthWrapper #InputCurrent #InputColumn:empty:after {
+  content: "";
 }
 #InputOverlay .widthWrapper #InputCurrent #InputValues .big-choice {
   padding: 10px;
