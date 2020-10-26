@@ -108,7 +108,7 @@ canvas {
   height: 36px;
 }
 #URL {
-  /* display: none; */
+  display: none;
   position: absolute;
   top: 3px;
   box-sizing: border-box;
@@ -140,7 +140,7 @@ canvas {
   width: 120px;
 }
 #Export {
-  /* display: none; */
+  display: none;
   left: 235px;
   width: 200px;
 }
