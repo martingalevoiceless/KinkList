@@ -143,6 +143,7 @@ class Selection {
   }
 
   updateSelection(value) {
+    this.clearSelection();
   	if (typeof value == "number") {
   		if (value < 0 || value >= this.options.length) {
   			value = 0;
@@ -152,11 +153,15 @@ class Selection {
   	} else {
 	    this.value = value || this.value;
   	}
-    this.element.childNodes
-                    .forEach(option => {option.classList.remove("selected")});
     const option =
     		this.element.querySelector(`.${toCSSClassName(this.value.name)}`);
     option.classList.add("selected");
+  }
+
+  clearSelection() {
+    this.value = this.options[0];
+    this.element.childNodes
+                    .forEach(option => option.classList.remove("selected"));
   }
 
   equals(selection) {
@@ -342,13 +347,15 @@ class Kinklist {
     }
   }
 
+  updateKinks() {
+    this.kinks = [].concat(...this.categories.map(category => category.kinks));
+  }
+
   appendCategory(...categories) {
     for (let category of categories) {
       this.categories.push(category);
-      const newKinks =
-      		category.kinks.filter(kink => !this.kinks.includes(kink));
-      this.kinks.push(...newKinks); 
     }
+    this.updateKinks();
   }
 
   addCategory(...categories) {
@@ -359,8 +366,16 @@ class Kinklist {
   removeCategory(...categoriesToRemove) {
     this.categories = this.categories
             .filter(category => !categoriesToRemove.includes(category));
-    this.kinks = [].concat(...this.categories.map(category => category.kinks));
+    this.updateKinks();
     this.hasCategoriesChanged = true;
+  }
+
+  flush() {
+    for (let kink of this.kinks) {
+      for (let selection of kink.selections) {
+        selection.clearSelection();
+      }
+    }
   }
  
   parseKinklistSettings(inputString) {
@@ -1014,6 +1029,7 @@ function init() {
   const editOKButtonElement = document.getElementById("KinksOK");
   const editTextareaElement = document.getElementById("Kinks");
   const startButtonElement = document.getElementById("StartButton");
+  const resetButtonElement = document.getElementById("ResetButton");
   const inputOverlayElement = document.getElementById("InputOverlay");
   const closePopupButtonElement = document.querySelector(".closePopup");
 
@@ -1095,6 +1111,9 @@ function init() {
   function dontPropagate(e) {
     e.stopPropagation();
   }
+  function resetButtonEventHandler() {
+    kinklist.flush();
+  }
 
   generateElement.addEventListener("mousedown", generateEventHandler);
   exportElement.addEventListener("mousedown", exportEventHandler)
@@ -1104,6 +1123,7 @@ function init() {
   startButtonElement.addEventListener("mousedown", startButtonEventHandler);
   inputOverlayElement.addEventListener("mousedown", inputFadeOutHandler);
   closePopupButtonElement.addEventListener("mousedown", inputFadeOutHandler);
+  resetButtonElement.addEventListener("mousedown", resetButtonEventHandler);
   document.addEventListener("keydown", keyboardEventHandler);
   document.querySelectorAll(".overlay > *")
       .forEach(element => element.addEventListener("mousedown", dontPropagate));
