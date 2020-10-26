@@ -120,6 +120,10 @@ class Selection {
     this.kink = kink;
   }
 
+  get index() {
+    return this.options.findIndex(value => value == this.value);
+  }
+
   get columnName() {
   	const kink = this.kink;
   	const category = kink.category;
@@ -144,12 +148,12 @@ class Selection {
 
   updateSelection(value) {
     this.clearSelection();
-  	if (typeof value == "number") {
+  	if (!isNaN(Number(value))) {
   		if (value < 0 || value >= this.options.length) {
+  			console.error("Selection value out of bounds!", value);
   			value = 0;
-  			console.error("Selection value out of bounds!");
   		}
-  		this.value = this.options[value];
+  		this.value = this.options[+value];
   	} else {
 	    this.value = value || this.value;
   	}
@@ -291,6 +295,25 @@ class Kinklist {
     this.hasCategoriesChanged = false;
     this.settings = settings || defaultSettings;
     this.parseKinklistSettings();
+  }
+
+  get localStorageString() {
+    const encodedSelections = [];
+    for (let kink of this.kinks) {
+      for (let selection of kink.selections) {
+        encodedSelections.push(selection.index);
+      }
+    }
+    return encodedSelections.join('');
+  }
+
+  set localStorageString(kinklistString) {
+    const encodedSelections = kinklistString.split('');
+    for (let kink of this.kinks) {
+      for (let selection of kink.selections) {
+        selection.updateSelection(encodedSelections.shift());
+      }
+    }
   }
 
   updateColumns() {
@@ -994,10 +1017,39 @@ function uploadToImgur(blob, filename) {
   });
 }
 
+class StorageHandler {
+  constructor(kinklist) {
+    this.kinklist = kinklist;
+    this.initialize();
+    return this;
+  }
 
+  initialize() {
+    const defaults = {
+      imgurData: '{}',
+    };
+    for (let key in defaults) {
+      if (!localStorage.getItem(key)) {
+        localStorage.setItem(key, defaults[key]);
+      }
+    }
+  }
+
+  reset() {
+    localStorage.clear();
+    this.initialize();
+  }
+
+  storeImgurData(data) {
+    let imgurData = JSON.parse(localStorage.getItem("imgurData"));
+    imgurData[data.id] = data.deletehash;
+    localStorage.setItem("imgurData", JSON.stringify(imgurData));
+  }
+}
 
 function init() {
   const kinklist = new Kinklist();
+  const storageHandler = new StorageHandler(kinklist);
   
   const selectionOptionObjects = kinklist.settings
       .selectionOptions.map(option => new SelectionOption(...option));
@@ -1053,6 +1105,7 @@ function init() {
           loadingElement.style.display = "none";
           urlElement.value = result.data.link;
           urlElement.style.display = "block";
+          storageHandler.storeImgurData(result.data);
         })
         .catch(error => {
           console.error(error);
