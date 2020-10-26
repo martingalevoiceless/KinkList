@@ -1013,7 +1013,7 @@ function init() {
   const editOverlayElement = document.getElementById("EditOverlay");
   const editOKButtonElement = document.getElementById("KinksOK");
   const editTextareaElement = document.getElementById("Kinks");
-  const startButtonElement = document.getElementById("StartBtn");
+  const startButtonElement = document.getElementById("StartButton");
   const inputOverlayElement = document.getElementById("InputOverlay");
   const closePopupButtonElement = document.querySelector(".closePopup");
 
