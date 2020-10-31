@@ -39,13 +39,37 @@ function toCSSClassName(str) {
 
 
 
+function hide(element) {
+  if (element.classList.contains("unhidden")) {
+    element.classList.remove("unhidden");
+    element.classList.add("hidden");
+  } else if (element.classList.contains("visible")) {
+    element.classList.remove("visible");
+    element.classList.add("invisible");
+  } else {
+    element.classList.add("hidden");
+  }
+}
+
+function unhide(element) {
+  if (element.classList.contains("hidden")) {
+    element.classList.remove("hidden");
+    element.classList.add("unhidden");
+  } else if (element.classList.contains("invisible")) {
+    element.classList.remove("invisible");
+    element.classList.add("visible");
+  } else {
+    element.classList.add("unhidden");
+  }
+}
+
 function fadeIn(element) {
   element.style.opacity = 0;
-  element.style.display = "block";
+  unhide(element);
   (function fade() {
     let opacity = +element.style.opacity;
     opacity += 0.1;
-    if (!(opacity > 1)){
+    if (opacity <= 1){
       element.style.opacity = opacity;
       requestAnimationFrame(fade);
     }
@@ -57,12 +81,11 @@ function fadeOut(element) {
   (function fade() {
     let opacity = +element.style.opacity;
     opacity -= 0.1;
-    if (!(opacity < 0)) {
+    if (opacity >= 0) {
       element.style.opacity = opacity;
       requestAnimationFrame(fade);
     }
-    else
-      element.style.display = "none";
+    else hide(element);
   })();
 }
 
@@ -98,11 +121,11 @@ class SelectionOption {
 
   createElement() {
     return createHTMLElement('button', null,
-        {class: "choice " + this.cssClassName, title: this.name});
+        {class: "circle " + this.cssClassName, title: this.name});
   }
 
   get cssRule() {
-    return `.choice.${this.cssClassName} {background-color: ${this.color};}`
+    return `.${this.cssClassName} {background-color: ${this.color};}`
   }
 
   equals(selectionOption) {
@@ -142,7 +165,7 @@ class Selection {
           () => {this.updateSelection(this.options[i])})
     }
     const element = createHTMLElement("div", buttonElements,
-                                    {class:"choices choice-target"})
+                                    {class:"selection"})
     return element;
   }
 
@@ -194,7 +217,7 @@ class Kink {
       cellElements.push(createHTMLElement("td", this.selections[i].element));
     cellElements.push(createHTMLElement("td", this.name));
     const element = createHTMLElement("tr", cellElements,
-                                    {class: `kinkRow ${this.cssClassName}`});
+                                    {class: `kink-row ${this.cssClassName}`});
     return element;
   }
 
@@ -219,7 +242,7 @@ class Category {
   createTableElement() {
     const headerCellElements = [...this.columnNames, '']
           .map(name => createHTMLElement("th", name,
-                            name ? {class: "choicesCol"} : undefined));
+                            name ? {class: "selection-column"} : undefined));
     const theadElement = createHTMLElement("thead", headerCellElements);
     const tbodyElement = createHTMLElement("tbody",
                                          this.kinks.map(kink => kink.element));
@@ -256,7 +279,7 @@ class Category {
     //  height = this.element.clientHeight;
     if (force) {
       const clone = this.element.cloneNode(true);
-      clone.classList.add("hidden");
+      clone.style.visibility = "hidden";
       document.body.append(clone);
       height = clone.clientHeight;
       clone.remove(); 
@@ -320,10 +343,8 @@ class Kinklist {
     const columnAmount =
         Math.min(4, Math.floor((document.body.scrollWidth - 20) / 400) || 1);
 
-    const columnClassNames = ["col100", "col50", "col33", "col25"];
-    const columnClassName = columnClassNames[columnAmount - 1];
-    //Category elements' margins overlap, being accounted twice. This
-    //correction value mitigates that discrepancy.
+    // Category elements' margins overlap, being accounted twice. This
+    // correction value mitigates that discrepancy.
     const overlapCorrection = -10;
 
     const columns = [];
@@ -361,9 +382,8 @@ class Kinklist {
           this.columns.map(column => 
                            column.map(category => category.element));
       const columnElements =
-            categoryElements.map(column => createHTMLElement("div", column, 
-                                            {class: "col " + columnClassName}));
-      const inputListElement = document.querySelector("#InputList");
+            categoryElements.map(column => createHTMLElement("div", column));
+      const inputListElement = document.querySelector("#Kinklist");
       removeInnerNodes(inputListElement);
       inputListElement.append(...columnElements);
       this.hasCategoriesChanged = false;
@@ -787,13 +807,18 @@ class Carousel {
   constructor(kinklistObject, carouselElement) {
     this.kinklist = kinklistObject;
     this.rootElement = carouselElement
-                       || document.querySelector("#InputOverlay .widthWrapper");
-    this.enabled = true;
+                       || document.querySelector("#CarouselInput");
     this.initialize(); // this.selections, this.index;
   }
 
   get selection() {
   	return this.selections[this.index];
+  }
+  get enabled() {
+    return this.rootElement.classList.contains("unhidden");
+  }
+  set enabled(value) {
+    value ? unhide(this.rootElement) : hide(this.rootElement);
   }
 
   moveIndexForward(amount = 1) {
@@ -839,7 +864,6 @@ class Carousel {
   			                          selection.value.name == "Not Entered");
   	if (this.index == -1) this.index = oldIndex;
   	this.previousSelection = this.selection;
-  	this.enabled = true;
   }
 
   initialize() {
@@ -879,7 +903,8 @@ class Carousel {
   }
 
   updateInputValues(selection) {
-  	const inputValuesElement = this.rootElement.querySelector("#InputValues");
+  	const inputValuesElement =
+        this.rootElement.querySelector("#CarouselValues");
   	removeInnerNodes(inputValuesElement);
   	inputValuesElement.append(...this.createInputValues(selection));
   }
@@ -887,14 +912,16 @@ class Carousel {
   updateInputCurrentElementState(selection = this.selection) {
   	const kink = selection.kink;
   	const category = kink.category;
-  	this.rootElement.querySelector("#InputCategory").textContent =
+  	this.rootElement.querySelector("#CarouselCategory").textContent =
   			category.name;
-  	this.rootElement.querySelector("#InputField").textContent = kink.name;
-  	this.rootElement.querySelector("#InputColumn").textContent = selection.columnName;
+  	this.rootElement.querySelector("#CarouselKink").textContent = kink.name;
+  	this.rootElement.querySelector("#CarouselColumn")
+        .textContent = selection.columnName;
   	const selectedElement = this.rootElement.querySelector(".selected");
   	if (selectedElement) selectedElement.classList.remove("selected");
   	const newSelectedElement =
-  			this.rootElement.querySelector(`#InputCurrent .${selection.value.cssClassName}`)
+  			this.rootElement
+            .querySelector(`#CarouselCurrent .${selection.value.cssClassName}`)
   					.parentElement;
   	newSelectedElement.classList.add("selected");
   }
@@ -909,7 +936,8 @@ class Carousel {
 			});
   		kinkSimpleDivElements.push(kinkSimpleDivElement);
   	}
-  	const inputPreviousElement = this.rootElement.querySelector("#InputPrevious");
+  	const inputPreviousElement =
+        this.rootElement.querySelector("#CarouselPrevious");
   	removeInnerNodes(inputPreviousElement);
   	inputPreviousElement.append(...kinkSimpleDivElements);
   }
@@ -924,7 +952,7 @@ class Carousel {
 			});
   		kinkSimpleDivElements.push(kinkSimpleDivElement);
   	}
-  	const inputNextElement = this.rootElement.querySelector("#InputNext");
+  	const inputNextElement = this.rootElement.querySelector("#CarouselNext");
   	removeInnerNodes(inputNextElement);
   	inputNextElement.append(...kinkSimpleDivElements);
   }
@@ -966,18 +994,20 @@ function appendCSSRuleToStylesheet(rule) {
 
 function generateLegend(selectionOptions) {
   const legendOptionElements = selectionOptions.map(option => {
-    const legendText = createHTMLElement('span', option.name,
-                                       {class: "legend-text"});
+    const legendText = createHTMLElement("span", option.name,
+                                       {class: "selection-name"});
     const legendMarker =
-        createHTMLElement('span', null,
+        createHTMLElement("span", null,
                           {
-                            "class": `choice ${toCSSClassName(option.name)}`,
+                            "class":
+                              `circle ${toCSSClassName(option.name)}`,
                             "data-color": option.color
                           });
-    const optionDiv = createHTMLElement('div', [legendMarker, legendText]);
+    const optionDiv = createHTMLElement("div", [legendMarker, legendText],
+                                        {class: "selection"});
     return optionDiv;
-  })
-  const legendElement = document.querySelector('.legend');
+  });
+  const legendElement = document.querySelector(".legend");
   removeInnerNodes(legendElement);
   legendElement.append(...legendOptionElements);
 }
@@ -1055,7 +1085,7 @@ function init() {
       .selectionOptions.map(option => new SelectionOption(...option));
   generateLegend(selectionOptionObjects);
   generateSelectionOptionCSS(selectionOptionObjects);
-  appendCSSRuleToStylesheet("#KinklistCanvas{border:solid 1px black}");
+  appendCSSRuleToStylesheet("#KinklistCanvas{border:solid 1px black; width: 100%;}");
 
 
 
@@ -1072,29 +1102,30 @@ function init() {
     })
   })()
 
-  const exportElement = document.getElementById("Export");
-  const generateElement = document.getElementById("Generate");
-  const urlElement = document.getElementById("URL");
-  const loadingElement = document.getElementById("Loading");
-  const editToggleElement = document.getElementById("Edit");
-  const editOverlayElement = document.getElementById("EditOverlay");
-  const editOKButtonElement = document.getElementById("KinksOK");
-  const editTextareaElement = document.getElementById("Kinks");
-  const startButtonElement = document.getElementById("StartButton");
-  const resetButtonElement = document.getElementById("ResetButton");
-  const inputOverlayElement = document.getElementById("InputOverlay");
-  const closePopupButtonElement = document.querySelector(".closePopup");
-
-  editTextareaElement.value = kinklist.settings.kinklistText;
+  const kinklistElement = document.querySelector("#Kinklist");
+  const exportButtonElement = document.querySelector(".export-button");
+  const exportLinkElement = document.querySelector(".export-link");
+  const generateButtonElement = document.querySelector(".generate-button");
+  const loadingElement = document.querySelector(".export-loading");
+  const settingsButtonElement = document.querySelector(".settings-button");
+  const settingsOverlayElement = document.querySelector("#SettingsInput");
+  const settingsConfirmButtonElement = document.querySelector("#SettingsConfirmButton");
+  const settingsTextareaElement = document.querySelector("#SettingsKinklistText");
+  const startButtonElement = document.querySelector(".input-button");
+  const resetButtonElement = document.querySelector(".reset-button");
+  const inputOverlayElement = document.querySelector("#CarouselInput");
+  const closeOverlayButtonElements = document.querySelectorAll(".close-overlay");
+  const overlayChildrenElements = document.querySelectorAll(".overlay > *");
+  settingsTextareaElement.value = kinklist.settings.kinklistText;
 
   // Shared variables for following event handlers.
   let kinklistCanvasDrawer;
   let carousel;
 
-  async function exportEventHandler() {
+  async function exportButtonEventHandler() {
     if (kinklistCanvasDrawer) {
-      urlElement.style.display = "none";
-      loadingElement.style.display = "block";
+      hide(exportLinkElement);
+      unhide(loadingElement);
       const blob = await new Promise((res, rej) => {
         kinklistCanvasDrawer.canvas.toBlob(blob => res(blob));
       });
@@ -1102,18 +1133,18 @@ function init() {
       uploadToImgur(blob, filename)
         .then(result => {
           console.log(result);
-          loadingElement.style.display = "none";
-          urlElement.value = result.data.link;
-          urlElement.style.display = "block";
+          hide(loadingElement);
+          exportLinkElement.value = result.data.link;
+          unhide(exportLinkElement);
           storageHandler.storeImgurData(result.data);
         })
         .catch(error => {
           console.error(error);
-          loadingElement.style.display = "none";
+          hide(loadingElement);
         });
     }
   }
-  function generateEventHandler() {
+  function generateButtonEventHandler() {
     const username =
         window.prompt("Enter nickname:", kinklist.settings.username);
     if (username) {
@@ -1124,23 +1155,27 @@ function init() {
       if (canvasElement) {
         canvasElement.replaceWith(kinklistCanvasDrawer.canvas);
       } else {
-        const inputListElement = document.querySelector("#InputList");
-        inputListElement.before(kinklistCanvasDrawer.canvas);
+        kinklistElement.before(kinklistCanvasDrawer.canvas);
       }
-      if (!exportElement.style.display) fadeIn(exportElement);
+      if (!exportButtonElement.style.display) {
+        fadeIn(exportButtonElement, "inline-block");
+      }
     } 
   }
-  function editToggleEventHandler() {
-    fadeIn(editOverlayElement);
+  function fadeInEventHandler() {
+    fadeIn(this);
   }
-  function editOverlayEventHandler() {
-    fadeOut(editOverlayElement)
+  function fadeOutEventHandler() {
+    fadeOut(this)
   }
-  function editOKButtonEventHandler() {
-    editOKButtonElement.disabled = true;
-    kinklist.parseKinklistSettings(editTextareaElement.value);
-    fadeOut(editOverlayElement)
-    editOKButtonElement.disabled = false;
+  function settingsButtonEventHandler() {
+    fadeIn(settingsOverlayElement)
+  }
+  function settingsConfirmButtonEventHandler() {
+    settingsConfirmButtonElement.disabled = true;
+    kinklist.parseKinklistSettings(settingsTextareaElement.value);
+    fadeOut(settingsOverlayElement)
+    settingsConfirmButtonElement.disabled = false;
   }
   function startButtonEventHandler() {
     if (!carousel) {
@@ -1150,10 +1185,6 @@ function init() {
       carousel.update();
     }
     fadeIn(inputOverlayElement);
-  }
-  function inputFadeOutHandler() {
-    fadeOut(inputOverlayElement);
-    carousel.enabled = false;
   }
   function keyboardEventHandler(pressed) {
     if (carousel && carousel.enabled && Number.isInteger(+pressed.key)
@@ -1166,20 +1197,35 @@ function init() {
   }
   function resetButtonEventHandler() {
     kinklist.flush();
+    const kinklistCanvasElement = document.querySelector("#KinklistCanvas");
+    if (kinklistCanvasElement) {
+      kinklistCanvasElement.remove();
+    }
+    exportLinkElement.value = '';
+    hide(exportLinkElement);
+    hide(exportButtonElement);
   }
 
-  generateElement.addEventListener("mousedown", generateEventHandler);
-  exportElement.addEventListener("mousedown", exportEventHandler)
-  editToggleElement.addEventListener("mousedown", editToggleEventHandler);
-  editOverlayElement.addEventListener("mousedown", editOverlayEventHandler);
-  editOKButtonElement.addEventListener("mousedown", editOKButtonEventHandler);
-  startButtonElement.addEventListener("mousedown", startButtonEventHandler);
-  inputOverlayElement.addEventListener("mousedown", inputFadeOutHandler);
-  closePopupButtonElement.addEventListener("mousedown", inputFadeOutHandler);
-  resetButtonElement.addEventListener("mousedown", resetButtonEventHandler);
+  [
+   [generateButtonElement, generateButtonEventHandler],
+   [exportButtonElement, exportButtonEventHandler],
+   [settingsButtonElement, settingsButtonEventHandler],
+   [settingsOverlayElement, fadeOutEventHandler],
+   [settingsConfirmButtonElement, settingsConfirmButtonEventHandler],
+   [startButtonElement, startButtonEventHandler],
+   [inputOverlayElement, fadeOutEventHandler],
+   [resetButtonElement, resetButtonEventHandler],
+   [closeOverlayButtonElements, fadeOutEventHandler],
+   [overlayChildrenElements, dontPropagate],
+  ].forEach(([element, handler]) => {
+    const attachHandler = (e, h) => e.addEventListener("mousedown", h);
+    if (element instanceof NodeList) {
+      element.forEach(e => attachHandler(e, handler.bind(e)));
+    } else {
+      attachHandler(element, handler.bind(element));
+    }
+  });
   document.addEventListener("keydown", keyboardEventHandler);
-  document.querySelectorAll(".overlay > *")
-      .forEach(element => element.addEventListener("mousedown", dontPropagate));
 }
 
 if (document.readyState === 'loading') { 
