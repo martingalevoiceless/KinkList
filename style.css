@@ -229,21 +229,22 @@ td {
 }
 #Kinklist > div:nth-child(1):nth-last-child(2),
 #Kinklist > div:nth-child(1):nth-last-child(2) ~ div {
-	width: calc(50% - var(--spacing));
+	width: calc(50% - (var(--spacing) / 2));
 }
 #Kinklist > div:nth-child(1):nth-last-child(3),
 #Kinklist > div:nth-child(1):nth-last-child(3) ~ div {
-	width: calc(33.3333% - 2 * var(--spacing));
+	width: calc(33.3333% - (2 * var(--spacing) / 3));
 }
 #Kinklist > div:nth-child(1):nth-last-child(4),
 #Kinklist > div:nth-child(1):nth-last-child(4) ~ div {
-	width: calc(25% - 3 * var(--spacing));
+	width: calc(25% - (3 * var(--spacing) / 4));
 }
 
-#Kinklist .selection .circle + .circle {
+#Kinklist .selection .circle + * {
 	margin-left: 5px;
 }
-#Kinklist .selection .circle {
+#Kinklist .selection .circle,
+#CarouselInput .circle {
 	margin-right: 0;
 	opacity: 35%;
 	transition: all 0.3s ease-in-out;
@@ -251,11 +252,115 @@ td {
 #Kinklist .selection .circle:hover {
 	opacity: 100%;
 }
-#Kinklist .selection .circle.selected {
+#Kinklist .selection .circle.selected,
+#CarouselInput .selected .circle {
 	opacity: 100%;
 	border-width: 2px;
 }
-
+#CarouselValues .selection-option {
+	margin-top: 5px;
+	padding: 10px;
+	background-color: #FFFFFFBF;
+	border-radius: 4px;
+	cursor: pointer;
+}
+#CarouselValues .selection-option * {
+	vertical-align: middle;
+}
+#CarouselValues .selection-option:hover {
+	padding: 8px;
+	border: solid #999999 2px;
+	background-color: #FFFFFFFF;
+	cursor: pointer;
+}
+#CarouselValues .selection-option.selected {
+	font-weight: bold;
+}
+#CarouselValues .selected .circle {
+	opacity: 100%;
+}
+#CarouselValues .legend-text {
+	margin-left: 5px;
+}
+.button-number-text {
+	display: inline-block;
+	float: right;
+	width: 16px;
+	border: solid #CCCCCC 1px;
+	border-radius: 3px;
+	text-align: center;
+}
+.selection-simple {
+	position: relative;
+	box-sizing: border-box;
+	padding-left: 10px;
+	padding-right: 10px;
+	line-height: 20px;
+	cursor: pointer;
+}
+.selection-simple * {
+	vertical-align: middle;
+}
+.selection-simple .category {
+	position: absolute;
+	top: 0;
+	right: 5px;
+	text-transform: uppercase;
+	font-weight: bold;
+	opacity: 60%;
+	font-size: 90%;
+}
+.selection-simple .column:not(:empty):before {
+	content: '(';
+}
+.selection-simple .column:not(:empty):after {
+	content: ')';
+}
+.selection-simple .column:not(:empty),
+.selection-simple .kink {
+	margin-left: 0.3em;
+}
+#CarouselPrevious .selection-simple:nth-last-child(1),
+#CarouselNext .selection-simple:nth-child(1) {
+	--sel-simple-padding-front: 10px;
+	--sel-simple-padding-back: 10px;
+	height: 40px;
+	margin-left: 3px;
+	margin-right: 3px;
+	background-color: #DDDDDD;
+}
+#CarouselPrevious .selection-simple:nth-last-child(2),
+#CarouselNext .selection-simple:nth-child(2) {
+	--sel-simple-padding-front: 9px;
+	--sel-simple-padding-back: 7px;
+	height: 37px;
+	margin-left: 6px;
+	margin-right: 6px;
+	background-color: #CCCCCC;
+	font-size: 11px;
+}
+#CarouselPrevious .selection-simple:nth-last-child(3),
+#CarouselNext .selection-simple:nth-child(3) {
+	--sel-simple-padding-front: 7px;
+	--sel-simple-padding-back: 4px;
+	height: 33px;
+	margin-left: 12px;
+	margin-right: 12px;
+	background-color: #BBBBBB;
+	font-size: 10px;
+}
+#CarouselPrevious .selection-simple {
+	padding-top: var(--sel-simple-padding-front);
+	padding-bottom: var(--sel-simple-padding-back);
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+}
+#CarouselNext .selection-simple {
+	padding-top: var(--sel-simple-padding-back);
+	padding-bottom: var(--sel-simple-padding-front);
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+}
 .overlay {
 	position: fixed;
 	top: 0;
@@ -270,9 +375,7 @@ td {
 	position: relative;
 }
 .close-overlay {
-	position: absolute;
-  top: 0;
-  right: 5px;
+	float: right;
   cursor: pointer;
   background-color: transparent;
   border-style: none;
@@ -346,6 +449,8 @@ td {
 	0% {opacity: 0%;}
 	100% {opacity: 100%;}
 }
+
+
 
 @media (max-width: 799px) {
 	.export-field, .export-field .export-link {

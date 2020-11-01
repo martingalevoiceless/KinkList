@@ -63,30 +63,51 @@ function unhide(element) {
   }
 }
 
+function isHidden(element) {
+  let result = false;
+  result |= element.classList.contains("hidden")
+         || element.classList.contains("invisible");
+  if (!result) {
+    const style = window.getComputedStyle(element);
+    result |= style.display == "none"
+           || style.opacity == 0
+           || style.visibility == "hidden"
+  }
+  return result;
+}
+
 function fadeIn(element) {
-  element.style.opacity = 0;
-  unhide(element);
-  (function fade() {
-    let opacity = +element.style.opacity;
-    opacity += 0.1;
-    if (opacity <= 1){
-      element.style.opacity = opacity;
-      requestAnimationFrame(fade);
+  return new Promise((resolve, reject) => {
+    if (isHidden(element)) {
+      element.style.opacity = 0;
+      unhide(element);
+      (function fade() {
+        let opacity = +element.style.opacity;
+        opacity += 0.1;
+        if (opacity <= 1){
+          element.style.opacity = opacity;
+          requestAnimationFrame(fade);
+        }
+      })();
     }
-  })();
+  });
 }
 
 function fadeOut(element) {
-  element.style.opacity = 1;
-  (function fade() {
-    let opacity = +element.style.opacity;
-    opacity -= 0.1;
-    if (opacity >= 0) {
-      element.style.opacity = opacity;
-      requestAnimationFrame(fade);
+  return new Promise((resolve, reject) => {
+    if (!isHidden(element)) {
+      element.style.opacity = 1;
+      (function fade() {
+        let opacity = +element.style.opacity;
+        opacity -= 0.1;
+        if (opacity >= 0) {
+          element.style.opacity = opacity;
+          requestAnimationFrame(fade);
+        }
+        else hide(element);
+      })();
     }
-    else hide(element);
-  })();
+  })
 }
 
 
@@ -878,17 +899,17 @@ class Carousel {
   		const option = selection.options[i];
 	  	const circleElement =
 	  			createHTMLElement("span", '',
-	  			                  {class: `choice ${option.cssClassName}`});
+	  			                  {class: `circle ${option.cssClassName}`});
 	  	const nameElement =
 	  			createHTMLElement("span", option.name, {class: "legend-text"});
 	  	const buttonNumberTextElement =
-	  			createHTMLElement("span", i, {class: "btn-num-text"});
+	  			createHTMLElement("span", i, {class: "button-number-text"});
 	  	const bigChoiceDivElement =
 	  			createHTMLElement("div",
 	  			                  [circleElement,
 	  			                  	nameElement,
 	  			                  	buttonNumberTextElement],
-	  			                  {class: "big-choice"});
+	  			                  {class: "selection-option"});
 	  	if (selection.value == option) {
 	  		bigChoiceDivElement.classList.add("selected");
 	  	}
@@ -968,20 +989,20 @@ class Carousel {
 		const kinkName = selection.kink.name;
 		const choiceElement =
 				createHTMLElement("span", '', 
-				                  {class: `choice ${selection.value.cssClassName}`});
-		const txtCategoryElement =
-				createHTMLElement("span", categoryName, {class: "txt-category"});
-		const txtFieldElement =
-				createHTMLElement("span", columnName, {class: "txt-field"});
-		const txtKinkElement =
-				createHTMLElement("span", kinkName, {class: "txt-kink"});
+				                  {class: `circle ${selection.value.cssClassName}`});
+		const categoryElement =
+				createHTMLElement("span", categoryName, {class: "category"});
+		const columnElement =
+				createHTMLElement("span", columnName, {class: "column"});
+		const kinkElement =
+				createHTMLElement("span", kinkName, {class: "kink"});
 		const kinkSimpleDivElement =
 				createHTMLElement("div",
 				                  [choiceElement,
-				                  	txtCategoryElement,
-				                  	txtFieldElement,
-				                  	txtKinkElement],
-				                  {class: "kink-simple"});
+				                  	categoryElement,
+				                  	columnElement,
+				                  	kinkElement],
+				                  {class: "selection-simple"});
 		return kinkSimpleDivElement;
   }
 }
@@ -1116,6 +1137,7 @@ function init() {
   const inputOverlayElement = document.querySelector("#CarouselInput");
   const closeOverlayButtonElements = document.querySelectorAll(".close-overlay");
   const overlayChildrenElements = document.querySelectorAll(".overlay > *");
+
   settingsTextareaElement.value = kinklist.settings.kinklistText;
 
   // Shared variables for following event handlers.
@@ -1162,11 +1184,11 @@ function init() {
       }
     } 
   }
-  function fadeInEventHandler() {
-    fadeIn(this);
+  function fadeInEventHandler(event) {
+    fadeIn(event.currentTarget);
   }
-  function fadeOutEventHandler() {
-    fadeOut(this)
+  function fadeOutEventHandler(event) {
+    fadeOut(event.currentTarget)
   }
   function settingsButtonEventHandler() {
     fadeIn(settingsOverlayElement)
@@ -1202,8 +1224,8 @@ function init() {
       kinklistCanvasElement.remove();
     }
     exportLinkElement.value = '';
-    hide(exportLinkElement);
-    hide(exportButtonElement);
+    fadeOut(exportLinkElement);
+    fadeOut(exportButtonElement);
   }
 
   [
@@ -1220,9 +1242,9 @@ function init() {
   ].forEach(([element, handler]) => {
     const attachHandler = (e, h) => e.addEventListener("mousedown", h);
     if (element instanceof NodeList) {
-      element.forEach(e => attachHandler(e, handler.bind(e)));
+      element.forEach(e => attachHandler(e, handler));
     } else {
-      attachHandler(element, handler.bind(element));
+      attachHandler(element, handler);
     }
   });
   document.addEventListener("keydown", keyboardEventHandler);
