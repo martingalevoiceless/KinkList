@@ -1227,6 +1227,13 @@ function init() {
     fadeOut(exportLinkElement);
     fadeOut(exportButtonElement);
   }
+  function closeOverlayEventHandler(event) {
+    let element = event.currentTarget;
+    while (!element.classList.contains("overlay")) {
+      element = element.parentElement;
+    }
+    fadeOut(element);
+  }
 
   [
    [generateButtonElement, generateButtonEventHandler],
@@ -1237,7 +1244,7 @@ function init() {
    [startButtonElement, startButtonEventHandler],
    [inputOverlayElement, fadeOutEventHandler],
    [resetButtonElement, resetButtonEventHandler],
-   [closeOverlayButtonElements, fadeOutEventHandler],
+   [closeOverlayButtonElements, closeOverlayEventHandler],
    [overlayChildrenElements, dontPropagate],
   ].forEach(([element, handler]) => {
     const attachHandler = (e, h) => e.addEventListener("mousedown", h);
