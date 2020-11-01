@@ -14,6 +14,10 @@ body {
 	--theme-color-input: #0EB214;
 	--theme-color-settings: #383749;
 	--theme-color-reset: #D70861;
+	--theme-table-header-bg-color: #666666;
+	--theme-table-border-color: #999999;
+	--theme-table-bg-color: transparent;
+	--theme-selection-button-radius-curvature: 50%;
 	font-family: "Verdana", "Arial";
 	font-size: 12px;
 }
@@ -47,9 +51,9 @@ table {
 	margin-bottom: 10px;
 }
 th {
-	border: solid #999999 1px;
+	border: solid var(--theme-table-border-color) 1px;
 	color: white;
-	background-color: #666666;
+	background-color: var(--theme-table-header-bg-color);
 	margin: 0px;
 	padding: 4px;
 }
@@ -59,12 +63,13 @@ th.selection-column {
 	width: 125px;
 }
 td {
-	border-left: solid #999999 1px;
-	border-right: solid #999999 1px;
-	border-bottom: solid #999999 1px;
+	border-left: solid var(--theme-table-border-color) 1px;
+	border-right: solid var(--theme-table-border-color) 1px;
+	border-bottom: solid var(--theme-table-border-color) 1px;
 	margin: 0;
 	padding: 4px;
 	padding-right: 0;
+	background-color: var(--theme-table-bg-color);
 }
 .widthWrapper {
 	max-width: 1700px;
@@ -111,7 +116,7 @@ td {
 	height: var(--circle-size);
 	width: var(--circle-size);
 	border: solid 1px black;
-	border-radius: 10px;
+	border-radius: var(--theme-selection-button-radius-curvature);
 	padding: 0px;
 }
 .selection .circle {
