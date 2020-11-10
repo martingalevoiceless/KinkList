@@ -1257,8 +1257,17 @@ function init() {
   document.addEventListener("keydown", keyboardEventHandler);
 }
 
+function attemptInit() {
+  try {
+    init()
+  } catch (error) {
+    console.error(error);
+    unhide(document.querySelector("#Error"));
+  }
+}
+
 if (document.readyState === 'loading') { 
-  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('DOMContentLoaded', attemptInit);
 } else {
-  init();
+  attemptInit();
 }
