@@ -8,26 +8,39 @@
 		<script src="./script.js"></script>
 	</head>
 	<body>
-		<header class="widthWrapper">
-			<div id="Title">
-				<span>Kinklist</span>
-			</div>
-			<div class="export">
-				<div class="export-field">
-					<input class="export-link invisible" type="url">
-					<span class="export-loading hidden">Loading</span>
+		<div class="contentWrapper widthWrapper">
+			<header>
+				<div id="Title">
+					<span>Kinklist</span>
 				</div>
-				<button class="export-button invisible">Export to Imgur</button>
-				<button class="generate-button">Generate</button>
+				<div class="export">
+					<div class="export-field">
+						<input class="export-link invisible" type="url">
+						<span class="export-loading hidden">Loading</span>
+					</div>
+					<button class="export-button invisible">Export to Imgur</button>
+					<button class="generate-button">Generate</button>
+				</div>
+				<div id="Menu">
+					<button class="settings-button"></button>
+					<button class="reset-button"></button>
+					<button class="input-button"></button>
+				</div>
+				<div class="legend"></div>
+			</header>
 			</div>
-			<div id="Menu">
-				<button class="settings-button"></button>
-				<button class="reset-button"></button>
-				<button class="input-button"></button>
-			</div>
-			<div class="legend"></div>
-		</header>
-		<div id="Kinklist" class="widthWrapper"></div>
+			<div id="Kinklist"></div>
+			<footer>
+				<p>Original idea by <a target="_blank" rel="noopener noreferrer" href="https://github.com/Goctionni/KinkList">Goctionni</a>.</p>			
+				<p>Complete rewrite by MobButcher. <a target="_blank" rel="noopener noreferrer" href="https://twitter.com/MobButcherDev">Twitter</a></p>
+				<p>Visit official <a target="_blank" rel="noopener noreferrer" href="https://github.com/MobButcher/KinkList">GitHub</a> page to learn how you can make new suggestions, report any issues, and more!</p>
+				<p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPAgMAAAAOp6AcAAAADFBMVEUAAAD///+7v7p1dnVTvlT+AAAAf0lEQVQY02PACkRDMUAIg9Qq09CiFSjqWBikVlwNjVmNLrgGqP7VATTBxQkz1LUaRFlYGAQEAhgYAwLAgm4Xt2s1CDgKMIgIsjCwMLKABV0Dw4EqGRxCBAUZRBkdQ5BUOjgwCASyMDAIssDMBKsEm8nqyIKwnbA7sfoIu9+xAQA32DGfdbaF4wAAAABJRU5ErkJggg==" /></a> This work is licensed under a <a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</p>
+				<p>Attribution to "MobButcher".</p>
+				<p>You are free to use images produced by this tool however you want: they're yours.</p>
+				<p>CC license logo was modified by MobButcher.</p>
+				<p>Version 1.1.2, released on November 9, 2020.</p>
+			</footer>
+		</div>
 		<div id="CarouselInput" class="overlay hidden">
 			<div class="overlay-wrapper">
 				<div id="CarouselPrevious"></div>
@@ -47,15 +60,5 @@
 				<button id="SettingsConfirmButton">Accept</button>
 			</div>
 		</div>
-		<footer>
-			<p>Original idea by <a target="_blank" rel="noopener noreferrer" href="https://github.com/Goctionni/KinkList">Goctionni</a>.</p>			
-			<p>Complete rewrite by MobButcher.</p>
-			<p>Visit official <a target="_blank" rel="noopener noreferrer" href="https://github.com/MobButcher/KinkList">GitHub</a> page to learn how you can make new suggestions, report any issues, and more!</p>
-			<p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPAgMAAAAOp6AcAAAADFBMVEUAAAD///+7v7p1dnVTvlT+AAAAf0lEQVQY02PACkRDMUAIg9Qq09CiFSjqWBikVlwNjVmNLrgGqP7VATTBxQkz1LUaRFlYGAQEAhgYAwLAgm4Xt2s1CDgKMIgIsjCwMLKABV0Dw4EqGRxCBAUZRBkdQ5BUOjgwCASyMDAIssDMBKsEm8nqyIKwnbA7sfoIu9+xAQA32DGfdbaF4wAAAABJRU5ErkJggg==" /></a> This work is licensed under a <a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</p>
-			<p>Attribution to "MobButcher".</p>
-			<p>You are free to use images produced by this tool however you want: they're yours.</p>
-			<p>CC license logo was modified by MobButcher.</p>
-			<p>Version 1.1.2, released on November 9, 2020.</p>
-		</footer>
 	</body>
 </html>

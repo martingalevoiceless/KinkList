@@ -1,4 +1,7 @@
 body {
+	--body-margin: 8px;
+	--min-viewport-size: 300px;
+
 	--button-margin: 5px;
 	--min-buttons: 3;
 	--max-buttons: 3;
@@ -18,6 +21,8 @@ body {
 	--theme-table-border-color: #999999;
 	--theme-table-bg-color: transparent;
 	--theme-selection-button-radius-curvature: 50%;
+
+	margin: 0;
 	font-family: "Verdana", "Arial";
 	font-size: 12px;
 }
@@ -219,6 +224,7 @@ td {
 
 #Kinklist {
 	position: relative;
+	flex: 1 0 auto;
 }
 #Kinklist > div {
 	--spacing: 10px;
@@ -491,10 +497,26 @@ td {
 	}
 }
 
+.contentWrapper {
+	display: flex;
+	min-height: calc(100vh - (2 * var(--body-margin)));
+	flex-flow: column nowrap;
+	padding: var(--body-margin);
+}
+footer {
+	box-sizing: border-box;
+	width: 100%;
+	padding: 0.5rem;
+	background-color: #EEEEEE;
+	flex: 0 0;
+}
 footer > p {
 	margin: 0;
 }
 footer * {
+	text-align: center;
+}
+footer img {
 	vertical-align: middle;
 }
 
