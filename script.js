@@ -818,7 +818,7 @@ class KinklistCanvasDrawer {
       columns[columnIndex].push(categories[i]);
       columnHeights[columnIndex] += categoryHeights[i];
     }
-    return columns;
+    return columns.filter(column => column.length);
   }
 }
 
