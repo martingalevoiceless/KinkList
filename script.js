@@ -6,7 +6,7 @@ function createHTMLElement(tag, inner, attributes) {
     if (Array.isArray(inner))
       inner.forEach(e => element.appendChild(e));
     else if (typeof inner == "object")
-      element.appendChild(inner)
+      element.appendChild(inner);
     else
       element.textContent = inner;
   }
@@ -107,7 +107,7 @@ function fadeOut(element) {
         else hide(element);
       })();
     }
-  })
+  });
 }
 
 
@@ -183,10 +183,10 @@ class Selection {
     const buttonElements = this.options.map(option => option.element);
     for (let i = 0; i < this.options.length; i++) {
       buttonElements[i].addEventListener('mousedown',
-          () => {this.updateSelection(this.options[i])})
+          () => {this.updateSelection(this.options[i])});
     }
     const element = createHTMLElement("div", buttonElements,
-                                    {class:"selection"})
+                                    {class:"selection"});
     return element;
   }
 
@@ -478,7 +478,7 @@ class Kinklist {
       }
       else
         newCategories.push(new Category(newCategoryName, columns, kinks, this));
-    })
+    });
     if (extraCategories) this.removeCategory(...extraCategories);
     if (newCategories) this.appendCategory(...newCategories);
     // Sort categories in order they were specified in the file.
@@ -603,7 +603,7 @@ class KinklistCanvasDrawer {
     	anchor.href = canvas.toDataURL();
     	anchor.download = this.filename;
     	anchor.click();
-    })
+    });
     return canvas;
   }
   createContext(canvas = this.canvas) {
@@ -916,7 +916,7 @@ class Carousel {
 
 	  	bigChoiceDivElement.addEventListener("mousedown", () => {
 	  		this.select(i);
-	  	})
+	  	});
 
 	  	bigChoiceDivElements.push(bigChoiceDivElement);
   	}
@@ -1010,7 +1010,7 @@ class Carousel {
 
 
 function appendCSSRuleToStylesheet(rule) {
-  cssStylesheet.insertRule(rule, cssStylesheet.cssRules.length)
+  cssStylesheet.insertRule(rule, cssStylesheet.cssRules.length);
 }
 
 function generateLegend(selectionOptions) {
@@ -1053,12 +1053,12 @@ function uploadToImgur(blob, filename) {
     xhr.addEventListener("error", function() {
       console.error("Error");
       reject(this);
-    })
+    });
 
     xhr.addEventListener("timeout", function() {
       console.error("Timeout");
       reject(this);
-    })
+    });
 
     xhr.open("POST", "https://api.imgur.com/3/image");
     xhr.setRequestHeader("Authorization", "Client-ID 546c25a59c58ad7");
@@ -1121,7 +1121,7 @@ function init() {
         }
       }, 150)
     })
-  })()
+  })();
 
   const kinklistElement = document.querySelector("#Kinklist");
   const exportButtonElement = document.querySelector(".export-button");
@@ -1188,15 +1188,15 @@ function init() {
     fadeIn(event.currentTarget);
   }
   function fadeOutEventHandler(event) {
-    fadeOut(event.currentTarget)
+    fadeOut(event.currentTarget);
   }
   function settingsButtonEventHandler() {
-    fadeIn(settingsOverlayElement)
+    fadeIn(settingsOverlayElement);
   }
   function settingsConfirmButtonEventHandler() {
     settingsConfirmButtonElement.disabled = true;
     kinklist.parseKinklistSettings(settingsTextareaElement.value);
-    fadeOut(settingsOverlayElement)
+    fadeOut(settingsOverlayElement);
     settingsConfirmButtonElement.disabled = false;
   }
   function startButtonEventHandler() {
@@ -1259,7 +1259,7 @@ function init() {
 
 function attemptInit() {
   try {
-    init()
+    init();
   } catch (error) {
     console.error(error);
     unhide(document.querySelector("#Error"));
