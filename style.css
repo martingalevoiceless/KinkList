@@ -399,8 +399,11 @@ td {
 	float: right;
   cursor: pointer;
   background-color: transparent;
+ 	color: var(--theme-color-button-dark);
   border-style: none;
   font-size: 30px;
+  width: 36px;
+  height: 36px;
   opacity: 0.65;
   outline-style: none!important;
 }
