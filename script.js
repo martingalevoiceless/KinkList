@@ -128,6 +128,16 @@ const defaultSettings = {
 
 
 
+class KinklistError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "KinklistError";
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, KinklistError);
+    }
+  }
+}
+
 class SelectionOption {
   constructor(name, color, selection) {
     this.name = name;
@@ -296,8 +306,8 @@ class Category {
 
   updateHeight(force) {
     let height;
-    //if (this.element.clientHeight)
-    //  height = this.element.clientHeight;
+    if (this.element.clientHeight)
+      height = this.element.clientHeight;
     if (force) {
       const clone = this.element.cloneNode(true);
       clone.style.visibility = "hidden";
@@ -341,7 +351,7 @@ class Kinklist {
     this.parseKinklistSettings();
   }
 
-  get localStorageString() {
+  get stateString() {
     const encodedSelections = [];
     for (let kink of this.kinks) {
       for (let selection of kink.selections) {
@@ -351,7 +361,7 @@ class Kinklist {
     return encodedSelections.join('');
   }
 
-  set localStorageString(kinklistString) {
+  set stateString(kinklistString) {
     const encodedSelections = kinklistString.split('');
     for (let kink of this.kinks) {
       for (let selection of kink.selections) {
@@ -486,6 +496,12 @@ class Kinklist {
         categoryNames.map(name => this.categories
                                       .find(category => category.name == name));
     this.updateColumns();
+  }
+}
+
+class KinklistElementGenerator {
+  constructor(kinklist) {
+    this.kinklist = kinklist;
   }
 }
 
@@ -721,6 +737,8 @@ class KinklistCanvasDrawer {
     const font = this.settings.text;
     const columns =
         this.spreadCategoriesAcrossColumns(kinklistObject.categories);
+    console.log(kinklistObject);
+    console.log(columns);
     const columnHeights =
         columns.map(column => column.map(category =>
                                this.calculateCategoryHeight
@@ -1068,20 +1086,71 @@ function uploadToImgur(blob, filename) {
   });
 }
 
+class PresetManager {
+  constructor(storageHandler) {
+    this.storage = storageHandler;
+    const {presets, currentPreset} = this.storage.presetData;
+    this.presets = presets;
+    this.currentPreset = currentPreset;
+    document.addEventListener("unload", this.unloadHandler);
+  }
+
+  create(name, contents = '') {
+    if (this.presets.hasOwnProperty(name)) {
+      throw new KinklistError("Preset already exists.");
+    }
+    this.presets[name] = contents;
+  }
+
+  update(name, contents) {
+    this.sanitizeName(name);
+    if (contents) {
+      this.presets[name] = contents;
+    }
+  }
+
+  delete(name) {
+    this.sanitizeName(name);
+    delete this.presets[name];
+  }
+
+  sanitizeName(name) {
+    const defaultPresets = ["default"];
+    if (defaultPresets.contains(name)) {
+      throw new KinklistError(`Cannot modify default preset "${name}".`);
+    }
+  }
+
+  unloadHandler() {
+    localStorage.setItem("presets", this.presets);
+  }
+}
+
 class StorageHandler {
   constructor(kinklist) {
+    this.defaults = {
+      imgurData: "{}",
+      presets: `{"default":"${defaultSettings.kinklistText}"}`,
+      currentPreset: '"default"',
+    };
     this.kinklist = kinklist;
     this.initialize();
     return this;
   }
 
+  get presetData() {
+    const presetDataEntries = ["presets", "currentPreset"];
+    const presetDataObject = {};
+    for (let key of presetDataEntries) {
+      presetDataObject[key] = JSON.parse(localStorage.getItem(key));
+    }
+    return presetDataObject;
+  }
+
   initialize() {
-    const defaults = {
-      imgurData: '{}',
-    };
-    for (let key in defaults) {
+    for (let key in this.defaults) {
       if (!localStorage.getItem(key)) {
-        localStorage.setItem(key, defaults[key]);
+        localStorage.setItem(key, this.defaults[key]);
       }
     }
   }
@@ -1128,7 +1197,7 @@ function init() {
   const exportLinkElement = document.querySelector(".export-link");
   const generateButtonElement = document.querySelector(".generate-button");
   const loadingElement = document.querySelector(".export-loading");
-  const settingsButtonElement = document.querySelector(".settings-button");
+  const settingsButtonElement = document.querySelector("#KinklistSettingsEditButton");
   const settingsOverlayElement = document.querySelector("#SettingsInput");
   const settingsConfirmButtonElement = document.querySelector("#SettingsConfirmButton");
   const settingsTextareaElement = document.querySelector("#SettingsKinklistText");
@@ -1137,6 +1206,9 @@ function init() {
   const inputOverlayElement = document.querySelector("#CarouselInput");
   const closeOverlayButtonElements = document.querySelectorAll(".close-overlay");
   const overlayChildrenElements = document.querySelectorAll(".overlay > *");
+  const overlayElements = document.querySelectorAll(".overlay");
+  const presetsOverlayElement = document.querySelector("#Presets");
+  const presetSettingsButtonElement = document.querySelector("#PresetSettingsButton");
 
   settingsTextareaElement.value = kinklist.settings.kinklistText;
 
@@ -1193,6 +1265,9 @@ function init() {
   function settingsButtonEventHandler() {
     fadeIn(settingsOverlayElement);
   }
+  function presetSettingsButtonEventHandler() {
+    fadeIn(presetsOverlayElement);
+  }
   function settingsConfirmButtonEventHandler() {
     settingsConfirmButtonElement.disabled = true;
     kinklist.parseKinklistSettings(settingsTextareaElement.value);
@@ -1238,14 +1313,14 @@ function init() {
   [
    [generateButtonElement, generateButtonEventHandler],
    [exportButtonElement, exportButtonEventHandler],
-   [settingsButtonElement, settingsButtonEventHandler],
-   [settingsOverlayElement, fadeOutEventHandler],
-   [settingsConfirmButtonElement, settingsConfirmButtonEventHandler],
+   //[settingsButtonElement, settingsButtonEventHandler],
+   //[settingsConfirmButtonElement, settingsConfirmButtonEventHandler],
    [startButtonElement, startButtonEventHandler],
-   [inputOverlayElement, fadeOutEventHandler],
    [resetButtonElement, resetButtonEventHandler],
    [closeOverlayButtonElements, closeOverlayEventHandler],
+   [overlayElements, fadeOutEventHandler],
    [overlayChildrenElements, dontPropagate],
+   [presetSettingsButtonElement, presetSettingsButtonEventHandler],
   ].forEach(([element, handler]) => {
     const attachHandler = (e, h) => e.addEventListener("mousedown", h);
     if (element instanceof NodeList) {

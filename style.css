@@ -17,6 +17,11 @@ body {
 	--theme-color-input: #0EB214;
 	--theme-color-settings: #383749;
 	--theme-color-reset: #D70861;
+	--theme-color-background: #FFFFFF;
+	--theme-color-button-light: #CCCCCC;
+	--theme-color-button-dark: #333333;
+	--theme-color-button-light-hover: #AAAAAA;
+	--theme-color-button-dark-hover: #555555;
 	--theme-table-header-bg-color: #666666;
 	--theme-table-border-color: #999999;
 	--theme-table-bg-color: transparent;
@@ -25,6 +30,7 @@ body {
 	margin: 0;
 	font-family: "Verdana", "Arial";
 	font-size: 12px;
+	background-color: var(--theme-color-background);
 }
 
 header {
@@ -41,6 +47,10 @@ button {
 	padding-left: 8px;
 	padding-right: 8px;
 	outline-style: none !important;
+	font-size: 18px;
+	text-transform: uppercase;
+	color: white;
+	border: none;
 }
 h2 {
 	margin-top: 10px;
@@ -89,7 +99,10 @@ td {
 	font-size: 28px;
 	font-weight: bold;
 }
-#Menu {
+#Title span:hover {
+	animation-iteration-count: 10;
+}
+.menu {
 	grid-row: 1;
 	grid-column: 3 / 4;
 	display: grid;
@@ -97,7 +110,7 @@ td {
 	grid-gap: var(--button-margin);
 	justify-content: flex-start;
 }
-#Menu button {
+.menu button {
 	flex: 0 0 auto;
 	height: var(--button-size);
 	width: var(--button-size);
@@ -119,7 +132,7 @@ td {
 	display: inline-block;
 	height: var(--circle-size);
 	width: var(--circle-size);
-	border: solid 1px black;
+	box-shadow: 0px 0px 0px 1px black;
 	border-radius: var(--theme-selection-button-radius-curvature);
 	padding: 0px;
 }
@@ -133,13 +146,9 @@ td {
 	vertical-align: middle;
 }
 .generate-button, .export-button {
-	font-size: 18px;
-	text-transform: uppercase;
 	height: 36px;
 	border-radius: 6px;
-	border: none;
 	flex: 0 0 auto;
-	color: white;
 	background-color: var(--theme-color-main);
 }
 .export {
@@ -199,7 +208,7 @@ td {
 	text-align: center;
 }
 
-#Menu button {
+.menu button {
 	box-sizing: border-box;
 	border: none;
 }
@@ -257,15 +266,16 @@ td {
 #CarouselInput .circle {
 	margin-right: 0;
 	opacity: 35%;
-	transition: all 0.3s ease-in-out;
+	transition: all 0.3s cubic-bezier(0, 0.5, 0.5, 1) 0.15s;
 }
 #Kinklist .selection .circle:hover {
 	opacity: 100%;
+	transition-delay: 0s;
 }
 #Kinklist .selection .circle.selected,
 #CarouselInput .selected .circle {
 	opacity: 100%;
-	border-width: 2px;
+	box-shadow: 0px 0px 0px 2px black;
 }
 #CarouselValues .selection-option {
 	margin-top: 5px;
@@ -379,6 +389,7 @@ td {
 	right: 0;
 	background-color: rgba(0, 0, 0, 0.8);
 	display: grid;
+	z-index: 2;
 }
 .overlay-wrapper {
 	margin: auto;
@@ -429,18 +440,9 @@ td {
 	content: ")";
 }
 
-#SettingsInput .overlay-wrapper {
-	width: 330px;
-	display: flex;
-	flex-flow: column nowrap;
-	height: calc(100% - 20px);
-}
-#SettingsInput * {
-	width: 100%;
-}
 #SettingsKinklistText {
 	box-sizing: border-box;
-	margin-bottom: 10px;
+	/*margin-bottom: 10px;*/
 	padding: 10px;
 	border-radius: 5px;
 	flex: 1 1 auto;
@@ -460,13 +462,119 @@ td {
 	100% {opacity: 100%;}
 }
 
+.contentWrapper {
+	display: flex;
+	min-height: calc(100vh - (2 * var(--body-margin)));
+	flex-flow: column nowrap;
+	padding: var(--body-margin);
+}
+footer {
+	box-sizing: border-box;
+	width: 100%;
+	padding: 0.5rem;
+	background-color: #EEEEEE;
+	flex: 0 0;
+}
+footer > p {
+	margin: 0;
+}
+footer * {
+	text-align: center;
+}
+footer img {
+	vertical-align: middle;
+}
+
+.tooltip-container {
+	position: relative;
+}
+
+.tooltip-container:hover .menu-tooltip {
+	opacity: 1;
+	visibility: visible;
+}
+
+.settings-button-tooltip {
+	--tooltip-width: 250px;
+	--tooltip-height: auto;
+	--menu-position: 1;
+	display: grid;
+	padding: 5px 4px;
+	grid-template-rows: 36px;
+	grid-row-gap: 5px;
+}
+.settings-button-tooltip button {
+	width: auto;
+	background-color: var(--theme-color-settings);
+}
+
+.menu-tooltip {
+	position: absolute;
+	width: var(--tooltip-width);
+	height: var(--tooltip-height);
+	box-sizing: border-box;
+	left: 50%;
+	margin-left: min(calc(-1 * var(--tooltip-width)
+	                		  + (var(--menu-position) - 0.5) * var(--button-size)
+	                		  + (var(--menu-position) - 1) * var(--button-margin)),
+									 calc(-0.5 * var(--tooltip-width)));
+	background-color: var(--theme-color-background);
+	border: solid 2px black;
+	border-radius: 8px;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.3s, visibility 0.3s;
+	z-index: 1;
+}
+
+#Presets .overlay-wrapper {
+	display: flex;
+	flex-flow: column nowrap;
+	width: 400px;
+	height: calc(100% - 20px);
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.preset-background {
+	display: flex;
+	flex-flow: column;
+	align-content: center;
+	box-sizing: border-box;
+	width: auto;
+	flex: 1 1 auto;
+	grid-gap: 5px;
+	background-color: white;
+	border-color: black;
+	border-radius: 10px;
+	padding: 20px;
+}
+
+#PresetSelector {
+	flex: 0 0 auto;
+	border-radius: 8px;
+	font-size: 20px;
+	margin-bottom: 15px;
+}
+
+#Presets button {
+	background-color: var(--theme-color-button-dark);
+	border-radius: 5px;
+	padding: 10px;
+	font-size: 20px;
+	transition: background-color 0.2s;
+}
+#Presets button:hover {
+	background-color: var(--theme-color-button-dark-hover);
+}
+
 
 
 @media (max-width: 799px) {
 	.export-field, .export-field .export-link {
 		width: 100%;
 	}
-	#Menu {
+	.menu {
 		grid-column: 2 / 3;
 		justify-content: flex-end;
 	}
@@ -497,39 +605,9 @@ td {
 	}
 }
 
-.contentWrapper {
-	display: flex;
-	min-height: calc(100vh - (2 * var(--body-margin)));
-	flex-flow: column nowrap;
-	padding: var(--body-margin);
-}
-footer {
-	box-sizing: border-box;
-	width: 100%;
-	padding: 0.5rem;
-	background-color: #EEEEEE;
-	flex: 0 0;
-}
-footer > p {
-	margin: 0;
-}
-footer * {
-	text-align: center;
-}
-footer img {
-	vertical-align: middle;
-}
-
 @media (max-width: 419px) {
-	#CarouselInput .overlay-wrapper {
-		width: auto;
-		margin-left: 10px;
-		margin-right: 10px;
-	}
-}
-
-@media (max-width: 349px) {
-	#SettingsInput .overlay-wrapper {
+	#CarouselInput .overlay-wrapper,
+	#Presets .overlay-wrapper {
 		width: auto;
 		margin-left: 10px;
 		margin-right: 10px;

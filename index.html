@@ -21,10 +21,17 @@
 					<button class="export-button invisible">Export to Imgur</button>
 					<button class="generate-button">Generate</button>
 				</div>
-				<div id="Menu">
-					<button class="settings-button"></button>
-					<button class="reset-button"></button>
+				<div class="menu">
 					<button class="input-button"></button>
+					<button class="reset-button"></button>
+					<div class="tooltip-container">
+						<button class="settings-button"></button>
+						<div class="menu-tooltip settings-button-tooltip">
+							<button id="PresetSettingsButton">Presets</button>
+							<button id="ExportedImagesEditButton">Exported Images</button>
+							<button id="HelpButton">Help</button>
+						</div>
+					</div>
 				</div>
 				<div class="legend"></div>
 			</header>
@@ -57,10 +64,20 @@
 				<div id="CarouselNext"></div>
 			</div>
 		</div>
-		<div id="SettingsInput" class="overlay hidden">
+		<div id="Presets" class="overlay hidden">
 			<div class="overlay-wrapper">
-				<textarea id="SettingsKinklistText"></textarea>
-				<button id="SettingsConfirmButton">Accept</button>
+				<div class="preset-background">
+					<select name="preset" id="PresetSelector">
+						<optgroup label="Default presets">
+							<option value="default">Default</option>
+						</optgroup>
+					</select>
+					<button>Create</button>
+					<button>Duplicate</button>
+					<button>Delete</button>
+					<textarea id="SettingsKinklistText"></textarea>
+					<button>Save</button>
+				</div>
 			</div>
 		</div>
 	</body>
