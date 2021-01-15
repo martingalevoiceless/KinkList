@@ -450,6 +450,7 @@ td {
 	border-radius: 5px;
 	flex: 1 1 auto;
 	font-family: monospace, "Courier New", Courier;
+	resize: none;
 }
 #SettingsConfirmButton {
 	flex: 0 0 30px;
@@ -554,21 +555,27 @@ footer img {
 }
 
 #PresetSelector {
-	flex: 0 0 auto;
+	flex: 1 1 auto;
 	border-radius: 8px;
 	font-size: 20px;
-	margin-bottom: 15px;
 }
 
-#Presets button {
+.preset-background > button {
 	background-color: var(--theme-color-button-dark);
 	border-radius: 5px;
 	padding: 10px;
 	font-size: 20px;
 	transition: background-color 0.2s;
 }
-#Presets button:hover {
+.preset-background > button:hover {
 	background-color: var(--theme-color-button-dark-hover);
+}
+.preset-header {
+	display: flex;
+	flex-flow: row nowrap;
+	grid-gap: 10px;
+	margin-bottom: 15px;
+	margin-right: -10px;
 }
 
 

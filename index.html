@@ -67,16 +67,19 @@
 		<div id="Presets" class="overlay hidden">
 			<div class="overlay-wrapper">
 				<div class="preset-background">
-					<select name="preset" id="PresetSelector">
-						<optgroup label="Default presets">
-							<option value="default">Default</option>
-						</optgroup>
-					</select>
-					<button>Create</button>
-					<button>Duplicate</button>
-					<button>Delete</button>
+					<div class="preset-header">
+						<select name="preset" id="PresetSelector">
+							<optgroup label="Default presets">
+								<option value="default">Default</option>
+							</optgroup>
+						</select>
+						<button class="close-overlay">&times;</button>
+					</div>
+					<button id="PresetCreate">Create</button>
+					<button id="PresetDuplicate">Duplicate</button>
+					<button id="PresetDelete">Delete</button>
 					<textarea id="SettingsKinklistText"></textarea>
-					<button>Save</button>
+					<button id="PresetSave">Save</button>
 				</div>
 			</div>
 		</div>
