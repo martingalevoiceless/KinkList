@@ -407,7 +407,8 @@ td {
   opacity: 0.65;
   outline-style: none!important;
 }
-.close-overlay:hover {
+.close-overlay:hover,
+.close-overlay:focus {
 	opacity: 1;
 }
 #CarouselInput .overlay-wrapper {
