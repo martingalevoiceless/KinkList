@@ -87,6 +87,8 @@ function fadeIn(element) {
         if (opacity <= 1){
           element.style.opacity = opacity;
           requestAnimationFrame(fade);
+        } else {
+          resolve();
         }
       })();
     }
@@ -103,11 +105,17 @@ function fadeOut(element) {
         if (opacity >= 0) {
           element.style.opacity = opacity;
           requestAnimationFrame(fade);
+        } else {
+          hide(element);
+          resolve();
         }
-        else hide(element);
       })();
     }
   });
+}
+
+function focus(element) {
+  window.setTimeout(() => element.focus(), 0);
 }
 
 
