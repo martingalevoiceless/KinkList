@@ -1145,29 +1145,43 @@ class PresetManager {
 class StorageHandler {
   constructor(kinklist) {
     this.defaults = {
-      imgurData: "{}",
-      presets: `{"default":"${defaultSettings.kinklistText}"}`,
-      currentPreset: '"default"',
+      imgurData: {},
+      presetDisplayNames: ["Default"],
+      //presetList: [/* Generated automatically below. */],
+      "--preset-default": `${defaultSettings.kinklistText}`,
+      currentPreset: "default",
     };
+    const presetList = this.defaults.presetDisplayNames
+        .map(displayName => toCSSClassName(displayName));
+    Object.defineProperty(this.defaults, "presetList", {value: presetList});
     this.kinklist = kinklist;
     this.initialize();
     return this;
   }
 
-  get presetData() {
-    const presetDataEntries = ["presets", "currentPreset"];
-    const presetDataObject = {};
-    for (let key of presetDataEntries) {
-      presetDataObject[key] = JSON.parse(localStorage.getItem(key));
-    }
-    return presetDataObject;
+  store(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+  }
+
+  retrieve(key) {
+    return JSON.parse(localStorage.getItem(key));
+  }
+
+  remove(key) {
+    localStorage.removeItem(key);
   }
 
   initialize() {
-    for (let key in this.defaults) {
-      if (!localStorage.getItem(key)) {
-        localStorage.setItem(key, this.defaults[key]);
+    try {
+      for (let key in this.defaults) {
+        if (!this.retrieve(key)) {
+          this.store(key, this.defaults[key]);
+        }
       }
+    } catch (e) {
+      console.error(e);
+      console.warn("Resetting localStorage.");
+      this.reset();
     }
   }
 
