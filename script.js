@@ -461,7 +461,9 @@ class Kinklist {
   }
  
   parseKinklistSettings(inputString) {
-    this.settings.kinklistText = inputString || this.settings.kinklistText;
+    inputString = inputString || this.settings.kinklistText;
+    inputString = this.sanitizeKinklistSettingsInput(inputString);
+    this.settings.kinklistText = inputString;
     const regexp = new RegExp(/#(.+)\n\((.+)\)\n((?:\*.+\n?)+)/g);
     let match;
     let matches = [];
@@ -504,6 +506,12 @@ class Kinklist {
         categoryNames.map(name => this.categories
                                       .find(category => category.name == name));
     this.updateColumns();
+  }
+
+  sanitizeKinklistSettingsInput(kinklistSettings) {
+    let sanitized = kinklistSettings;
+    sanitized = sanitized.replace(/ ?\/ ?/g, "​/​"); // Zero-width spaces.
+    return sanitized;
   }
 }
 
