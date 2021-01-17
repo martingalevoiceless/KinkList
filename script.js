@@ -1,7 +1,18 @@
 "use strict";
 
-function createHTMLElement(tag, inner, attributes) {
+function createHTMLElement(cssSelector, inner, attributes) {
+  /* Separates tag from additional componenets.
+   * Permitted components, in any order:
+   * .classname
+   * #ID
+   * [attribute] or [attribute=value]
+   * Must be without any spaces, permitted characters: A-Za-z0-9_-
+   * Example: button#ExportButton.hidden[disabled]
+   */
+  const regex = /([\w-]+)((?:(?:[#.][\w-]+)|(?:\[[\w-]+(?:=[\w-]*)?\]))+)?/;
+  const [_, tag, components] = cssSelector.match(regex);
   const element = document.createElement(tag);
+
   if (inner != undefined) {
     if (Array.isArray(inner))
       inner.forEach(e => element.appendChild(e));
@@ -10,8 +21,30 @@ function createHTMLElement(tag, inner, attributes) {
     else
       element.textContent = inner;
   }
-  for (let name in attributes)
+
+  for (let name in attributes) {
     element.setAttribute(name, attributes[name]);
+  }
+
+  if (components) {
+    const classRegex = /\.[\w-]+/g
+    const idRegex = /\#[\w-]+/g
+    const attributeRegex = /\[[\w-]+(?:=[\w-]*)?\]/g
+    const classes = (components.match(classRegex) || []).map(x => x.slice(1));
+    const ids = (components.match(idRegex) || []).map(x => x.slice(1));
+    const attributes =
+        (components.match(attributeRegex) || []).map(x => x.slice(1, -1));
+    for (let className of classes) {
+      element.classList.add(className);
+    }
+    for (let id of ids) {
+      element.id = id;
+    }
+    for (let attribute of attributes) {
+      const [name, value] = attribute.split('=');
+      element.setAttribute(name, value || '');
+    }
+  }
   return element;
 }
 
@@ -159,8 +192,8 @@ class SelectionOption {
   }
 
   createElement() {
-    return createHTMLElement('button', null,
-        {class: "circle " + this.cssClassName, title: this.name});
+    return createHTMLElement(`button.circle.${this.cssClassName}`, null,
+        {title: this.name});
   }
 
   get cssRule() {
@@ -203,8 +236,7 @@ class Selection {
       buttonElements[i].addEventListener('mousedown',
           () => {this.updateSelection(this.options[i])});
     }
-    const element = createHTMLElement("div", buttonElements,
-                                    {class:"selection"});
+    const element = createHTMLElement("div.selection", buttonElements);
     return element;
   }
 
@@ -255,8 +287,8 @@ class Kink {
     for (let i = 0; i < this.columnAmount; i++)
       cellElements.push(createHTMLElement("td", this.selections[i].element));
     cellElements.push(createHTMLElement("td", this.name));
-    const element = createHTMLElement("tr", cellElements,
-                                    {class: `kink-row ${this.cssClassName}`});
+    const element = createHTMLElement(`tr.kink-row.${this.cssClassName}`,
+                                      cellElements,);
     return element;
   }
 
@@ -285,17 +317,16 @@ class Category {
     const theadElement = createHTMLElement("thead", headerCellElements);
     const tbodyElement = createHTMLElement("tbody",
                                          this.kinks.map(kink => kink.element));
-    const tableElement = createHTMLElement("table",
-                                         [theadElement, tbodyElement],
-                                         {class: "kinkGroup"});
+    const tableElement = createHTMLElement("table.kinkGroup",
+                                           [theadElement, tbodyElement]);
     return tableElement;
   }
 
   createDivElement() {
     const titleElement = createHTMLElement("h2", this.name);
     const divElement =
-        createHTMLElement("div", [titleElement, this.tableElement],
-            {class: `kinkCategory cat-${toCSSClassName(this.name)}`});
+        createHTMLElement(`div.kinkCategory.cat-${toCSSClassName(this.name)}`,
+                          [titleElement, this.tableElement]);
     return divElement;
   }
 
@@ -625,9 +656,8 @@ class KinklistCanvasDrawer {
 
   createCanvas(height = this.settings.canvas.height,
                width = this.settings.canvas.width) {
-    const canvas = createHTMLElement("canvas", null,
-                                     {width: width, height: height,
-                                      id: "KinklistCanvas"});
+    const canvas = createHTMLElement("canvas#KinklistCanvas", null,
+                                     {width: width, height: height});
     canvas.height = height;
     canvas.width = width;
     canvas.addEventListener("click", () => {
@@ -932,18 +962,16 @@ class Carousel {
   	for (let i = 0; i < selection.options.length; i++) {
   		const option = selection.options[i];
 	  	const circleElement =
-	  			createHTMLElement("span", '',
-	  			                  {class: `circle ${option.cssClassName}`});
+	  			createHTMLElement(`span.circle.${option.cssClassName}`);
 	  	const nameElement =
-	  			createHTMLElement("span", option.name, {class: "legend-text"});
+	  			createHTMLElement("span.legend-text", option.name);
 	  	const buttonNumberTextElement =
-	  			createHTMLElement("span", i, {class: "button-number-text"});
+	  			createHTMLElement("span.button-number-text", i);
 	  	const bigChoiceDivElement =
-	  			createHTMLElement("div",
+	  			createHTMLElement("div.selection-option",
 	  			                  [circleElement,
 	  			                  	nameElement,
-	  			                  	buttonNumberTextElement],
-	  			                  {class: "selection-option"});
+	  			                  	buttonNumberTextElement]);
 	  	if (selection.value == option) {
 	  		bigChoiceDivElement.classList.add("selected");
 	  	}
@@ -1022,21 +1050,19 @@ class Carousel {
 		const columnName = selection.columnName;
 		const kinkName = selection.kink.name;
 		const choiceElement =
-				createHTMLElement("span", '', 
-				                  {class: `circle ${selection.value.cssClassName}`});
+				createHTMLElement(`span.circle.${selection.value.cssClassName}`);
 		const categoryElement =
-				createHTMLElement("span", categoryName, {class: "category"});
+				createHTMLElement("span.category", categoryName);
 		const columnElement =
-				createHTMLElement("span", columnName, {class: "column"});
+				createHTMLElement("span.column", columnName);
 		const kinkElement =
-				createHTMLElement("span", kinkName, {class: "kink"});
+				createHTMLElement("span.kink", kinkName);
 		const kinkSimpleDivElement =
-				createHTMLElement("div",
+				createHTMLElement("div.selection-simple",
 				                  [choiceElement,
 				                  	categoryElement,
 				                  	columnElement,
-				                  	kinkElement],
-				                  {class: "selection-simple"});
+				                  	kinkElement]);
 		return kinkSimpleDivElement;
   }
 }
@@ -1049,17 +1075,11 @@ function appendCSSRuleToStylesheet(rule) {
 
 function generateLegend(selectionOptions) {
   const legendOptionElements = selectionOptions.map(option => {
-    const legendText = createHTMLElement("span", option.name,
-                                       {class: "selection-name"});
+    const legendText = createHTMLElement("span.selection-name", option.name);
     const legendMarker =
-        createHTMLElement("span", null,
-                          {
-                            "class":
-                              `circle ${toCSSClassName(option.name)}`,
-                            "data-color": option.color
-                          });
-    const optionDiv = createHTMLElement("div", [legendMarker, legendText],
-                                        {class: "selection"});
+        createHTMLElement(`span.circle.${toCSSClassName(option.name)}`);
+    const optionDiv = createHTMLElement("div.selection",
+                                        [legendMarker, legendText]);
     return optionDiv;
   });
   const legendElement = document.querySelector(".legend");
@@ -1411,7 +1431,7 @@ function init() {
     for (const presetName of newPresets) {
       const preset = presetManager.get(presetName);
       const option =
-          createHTMLElement("option", preset.displayName, {value: preset.name});
+          createHTMLElement(`option[value=${preset.name}]`, preset.displayName);
       selectElement.add(option);
     }
 
