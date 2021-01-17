@@ -418,10 +418,26 @@ td {
 	padding: 10px;
 	background-color: #EEEEEE;
 }
+#CarouselCurrent header {
+	display: grid;
+	grid-template-rows: auto auto;
+	grid-template-columns: auto 36px;
+}
 #CarouselCategory {
 	margin: 0;
 	opacity: 0.6;
 	text-transform: uppercase;
+	grid-column: 1;
+	grid-row: 1;
+}
+#CarouselSelection {
+	grid-column: 1;
+	grid-row: 2;
+}
+#CarouselCurrent .close-overlay {
+	grid-column: 2;
+	grid-row: 1 / 3;
+	align-self: center;
 }
 #CarouselKink {
 	display: inline;
