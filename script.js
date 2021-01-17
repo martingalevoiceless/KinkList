@@ -1191,9 +1191,9 @@ class StorageHandler {
   }
 
   storeImgurData(data) {
-    let imgurData = JSON.parse(localStorage.getItem("imgurData"));
+    let imgurData = this.retrieve("imgurData");
     imgurData[data.id] = data.deletehash;
-    localStorage.setItem("imgurData", JSON.stringify(imgurData));
+    this.store("imgurData", imgurData);
   }
 }
 
