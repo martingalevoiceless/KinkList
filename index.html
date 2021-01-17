@@ -8,7 +8,7 @@
 		<script src="./script.js"></script>
 	</head>
 	<body>
-		<div class="contentWrapper widthWrapper">
+		<div class="contentWrapper widthWrapper body">
 			<header>
 				<div id="Title">
 					<span>Kinklist</span>
@@ -55,10 +55,14 @@
 			<div class="overlay-wrapper">
 				<div id="CarouselPrevious"></div>
 				<div id="CarouselCurrent">
-					<button class="close-overlay">&times;</button>
-					<h2 id="CarouselCategory"></h2>
-					<h3 id="CarouselKink"></h3>
-					<h3 id="CarouselColumn"></h3>
+					<header>
+						<h2 id="CarouselCategory"></h2>
+						<div id="CarouselSelection">
+							<h3 id="CarouselKink"></h3>
+							<h3 id="CarouselColumn"></h3>
+						</div>
+						<button class="close-overlay">&times;</button>
+					</header>
 					<div id="CarouselValues"></div>
 				</div>
 				<div id="CarouselNext"></div>
@@ -69,17 +73,19 @@
 				<div class="preset-background">
 					<div class="preset-header">
 						<select name="preset" id="PresetSelector">
-							<optgroup label="Default presets">
-								<option value="default">Default</option>
-							</optgroup>
+							<option disabled>Built-in presets</option>
+							<option value="default">Default</option>
+							<option disabled>Custom presets</option>
 						</select>
 						<button class="close-overlay">&times;</button>
 					</div>
 					<button id="PresetCreate">Create</button>
+					<button id="PresetRename" class="disable-on-default">Rename</button>
 					<button id="PresetDuplicate">Duplicate</button>
-					<button id="PresetDelete">Delete</button>
-					<textarea id="SettingsKinklistText"></textarea>
-					<button id="PresetSave">Save</button>
+					<button id="PresetDelete" class="disable-on-default">Delete</button>
+					<textarea id="PresetTextarea" class="disable-on-default"></textarea>
+					<button id="PresetSave" class="disable-on-default">Save</button>
+					<button id="PresetSelect">Select</button>
 				</div>
 			</div>
 		</div>

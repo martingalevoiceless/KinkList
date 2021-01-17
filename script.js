@@ -1102,43 +1102,126 @@ function uploadToImgur(blob, filename) {
   });
 }
 
+class Preset {
+  constructor(displayName, data) {
+    this.displayName = displayName;
+    this.data = data || '';
+  }
+
+  get name() {
+    return toCSSClassName(this.displayName);
+  }
+
+  get internalName() {
+    return `--preset-${this.name}`;
+  }
+}
+
 class PresetManager {
   constructor(storageHandler) {
     this.storage = storageHandler;
-    const {presets, currentPreset} = this.storage.presetData;
-    this.presets = presets;
-    this.currentPreset = currentPreset;
-    document.addEventListener("unload", this.unloadHandler);
+    this.presets = new Map();
+    const presetDisplayNames = this.storage.retrieve("presetDisplayNames");
+    presetDisplayNames.forEach(displayName => {
+      const preset = new Preset(displayName);
+      preset.data = this.storage.retrieve(preset.internalName);
+      this.presets.set(preset.name, preset);
+    });
+    this.currentPreset = this.get(this.storage.retrieve("currentPreset"));
+    this.selectedPreset = this.currentPreset;
   }
 
-  create(name, contents = '') {
-    if (this.presets.hasOwnProperty(name)) {
-      throw new KinklistError("Preset already exists.");
-    }
-    this.presets[name] = contents;
+  get presetList() {
+    return [].concat(...this.presets.keys());
+  }
+  get presetDisplayNameList() {
+    return [].concat(...this.presets.values()).map(preset =>
+                                                   preset.displayName);
+  }
+  get defaultData() {
+    return this.presets.get("default").data;
   }
 
-  update(name, contents) {
+  get(name) {
+    return this.presets.get(name);
+  }
+
+  create(displayName, data = '') {
+    const name = toCSSClassName(displayName);
     this.sanitizeName(name);
-    if (contents) {
-      this.presets[name] = contents;
+    if (this.presets.has(name)) {
+      throw new KinklistError(`Preset "${name}" already exists.`);
     }
+    this.presets.set(name, new Preset(displayName, data));
+    this.save();
+  }
+
+  update(name, data) {
+    this.sanitizeName(name);
+    if (data) {
+      this.presets.get(name).data = data;
+    }
+    this.save();
+  }
+
+  rename(name, newDisplayName) {
+    const newName = toCSSClassName(newDisplayName);
+    this.sanitizeName(name);
+    this.sanitizeName(newName);
+    const data = this.get(name).data;
+    if (this.presets.has(newName)) {
+      throw new KinklistError(`Preset "${name}" already exists.`);
+    }
+    this.delete(name);
+    this.create(newDisplayName, data);
+    this.select(newName);
   }
 
   delete(name) {
     this.sanitizeName(name);
-    delete this.presets[name];
+    const preset = this.get(name);
+    if (this.currentPreset == preset) {
+      this.currentPreset = this.get("default");
+    }
+    if (this.selectedPreset == preset) {
+      this.cancel();
+    }
+    this.presets.delete(preset.name);
+    this.storage.remove(preset.internalName);
+    this.save();
+  }
+
+  select(name) {
+    if (this.presetList.includes(name)) {
+      this.selectedPreset = this.get(name);
+    } else {
+      const errorMessage = `Attempted to select non-existent preset "${name}".`;
+      throw new KinklistError(errorMessage);
+    }
+    this.save();
+  }
+
+  apply() {
+    this.currentPreset = this.selectedPreset;
+    this.save();
+  }
+  cancel() {
+    this.selectedPreset = this.currentPreset;
   }
 
   sanitizeName(name) {
-    const defaultPresets = ["default"];
-    if (defaultPresets.contains(name)) {
+    const defaultPresets = this.storage.defaults.presetList;
+    if (defaultPresets.includes(name)) {
       throw new KinklistError(`Cannot modify default preset "${name}".`);
     }
   }
 
-  unloadHandler() {
-    localStorage.setItem("presets", this.presets);
+  save() {
+    this.storage.store("presetDisplayNames", this.presetDisplayNameList);
+    for (const preset of this.presets.values()) {
+      this.storage.store(preset.internalName, preset.data);
+    }
+    this.storage.store("currentPreset", this.currentPreset.name);
   }
 }
 
@@ -1200,6 +1283,7 @@ class StorageHandler {
 function init() {
   const kinklist = new Kinklist();
   const storageHandler = new StorageHandler(kinklist);
+  const presetManager = new PresetManager(storageHandler);
   
   const selectionOptionObjects = kinklist.settings
       .selectionOptions.map(option => new SelectionOption(...option));
@@ -1227,20 +1311,24 @@ function init() {
   const exportLinkElement = document.querySelector(".export-link");
   const generateButtonElement = document.querySelector(".generate-button");
   const loadingElement = document.querySelector(".export-loading");
-  const settingsButtonElement = document.querySelector("#KinklistSettingsEditButton");
-  const settingsOverlayElement = document.querySelector("#SettingsInput");
-  const settingsConfirmButtonElement = document.querySelector("#SettingsConfirmButton");
-  const settingsTextareaElement = document.querySelector("#SettingsKinklistText");
+  const presetSettingsButtonElement = document.querySelector("#PresetSettingsButton");
+  const presetOverlayElement = document.querySelector("#Presets");
+  const presetSelectorElement = document.querySelector("#PresetSelector");
+  const presetCreateButtonElement = document.querySelector("#PresetCreate");
+  const presetRenameButtonElement = document.querySelector("#PresetRename");
+  const presetDuplicateButtonElement = document.querySelector("#PresetDuplicate");
+  const presetDeleteButtonElement = document.querySelector("#PresetDelete");
+  const presetSaveButtonElement = document.querySelector("#PresetSave");
+  const presetSelectButtonElement = document.querySelector("#PresetSelect");
+  const presetTextareaElement = document.querySelector("#PresetTextarea");
   const startButtonElement = document.querySelector(".input-button");
   const resetButtonElement = document.querySelector(".reset-button");
   const inputOverlayElement = document.querySelector("#CarouselInput");
   const closeOverlayButtonElements = document.querySelectorAll(".close-overlay");
   const overlayChildrenElements = document.querySelectorAll(".overlay > *");
   const overlayElements = document.querySelectorAll(".overlay");
-  const presetsOverlayElement = document.querySelector("#Presets");
-  const presetSettingsButtonElement = document.querySelector("#PresetSettingsButton");
 
-  settingsTextareaElement.value = kinklist.settings.kinklistText;
+  presetTextareaElement.value = kinklist.settings.kinklistText;
 
   // Shared variables for following event handlers.
   let kinklistCanvasDrawer;
@@ -1286,24 +1374,137 @@ function init() {
       }
     } 
   }
+
   function fadeInEventHandler(event) {
     fadeIn(event.currentTarget);
   }
   function fadeOutEventHandler(event) {
     fadeOut(event.currentTarget);
   }
-  function settingsButtonEventHandler() {
-    fadeIn(settingsOverlayElement);
+  
+  const presetControlElementList =
+      [].concat(...presetOverlayElement
+                .querySelectorAll(".preset-background > button"))
+        .concat(presetTextareaElement);
+  function disablePresetControlElements(disabled = false) {
+    for (const element of presetControlElementList) {
+      element.disabled = disabled;
+    }
   }
-  function presetSettingsButtonEventHandler() {
-    fadeIn(presetsOverlayElement);
+  function updatePresetSelector(selectElement = presetSelectorElement) {
+    function getOptionsList(filterDisabled = true) {
+      let result = new Array(...selectElement.options)
+      if (filterDisabled) {
+        result = result.filter(option => !option.disabled);
+      }
+      result = result.map(option => option.value);
+      return result;
+    }
+
+    const selectOptionsList = getOptionsList();
+    const presetList = presetManager.presetList;
+    const newPresets =
+        presetList.filter(preset => !selectOptionsList.includes(preset));
+    const obsoletePresets =
+        selectOptionsList.filter(option => !presetList.includes(option));
+
+    for (const presetName of newPresets) {
+      const preset = presetManager.get(presetName);
+      const option =
+          createHTMLElement("option", preset.displayName, {value: preset.name});
+      selectElement.add(option);
+    }
+
+    for (const presetName of obsoletePresets) {
+      const index = getOptionsList(false).indexOf(presetName);
+      selectElement.remove(index);
+    }
+
+    const currentPresetIndex = getOptionsList(false)
+        .indexOf(presetManager.selectedPreset.name);
+    selectElement.selectedIndex = currentPresetIndex;
   }
-  function settingsConfirmButtonEventHandler() {
-    settingsConfirmButtonElement.disabled = true;
-    kinklist.parseKinklistSettings(settingsTextareaElement.value);
-    fadeOut(settingsOverlayElement);
-    settingsConfirmButtonElement.disabled = false;
+  function updatePresetTextarea() {
+    presetTextareaElement.value = presetManager.selectedPreset.data;
   }
+  function updatePresetDisablableElements() {
+    const defaultPresets = presetManager.storage.defaults.presetList;
+    const selectedPreset = presetManager.selectedPreset.name
+    const disableOnDefaultElementList =
+        presetOverlayElement.querySelectorAll(".disable-on-default");
+    const disabledState = defaultPresets.includes(selectedPreset);
+    disablePresetControlElements(false);
+    for (const element of disableOnDefaultElementList) {
+      element.disabled = disabledState;
+    }
+  }
+  function updatePresetOverlayState() {
+    updatePresetTextarea();
+    updatePresetSelector();
+    updatePresetDisablableElements();
+  }
+  async function presetSettingsButtonEventHandler() {
+    updatePresetOverlayState();
+    await fadeIn(presetOverlayElement);
+    presetSelectorElement.focus();
+  }
+  function presetCreateButtonEventHandler() {
+    const displayName = window.prompt("Enter new preset name:");
+    if (displayName) {
+      presetManager.create(displayName, presetManager.get("default").data);
+      const name = toCSSClassName(displayName);
+      presetManager.select(name);
+      updatePresetOverlayState();
+      focus(presetTextareaElement);
+    }
+  }
+  function presetRenameButtonEventHandler() {
+    const currentName = presetManager.selectedPreset.name;
+    const displayName = presetManager.selectedPreset.displayName;
+    const newDisplayName = window.prompt(`Rename preset "${displayName}":`);
+    if (newDisplayName) {
+      presetManager.rename(currentName, newDisplayName);
+      updatePresetOverlayState();
+    }
+  }
+  function presetDuplicateButtonEventHandler() {
+    const displayName = window.prompt("Enter new preset name:");
+    if (displayName) {
+      presetManager.create(displayName, presetManager.selectedPreset.data);
+      const name = toCSSClassName(displayName);
+      presetManager.select(name);
+      updatePresetOverlayState();
+      focus(presetTextareaElement);
+    }
+  }
+  function presetDeleteButtonEventHandler() {
+    presetManager.delete(presetManager.selectedPreset.name);
+    updatePresetOverlayState();
+  }
+  function presetSaveButtonEventHandler() {
+    const newData = presetTextareaElement.value;
+    presetManager.update(presetManager.selectedPreset.name, newData);
+  }
+  function presetSelectButtonEventHandler(event) {
+    try {
+      presetSaveButtonEventHandler();
+    } catch (e) {
+      if (e.name == "KinklistError") {
+        console.error(e);
+      } else throw e;
+    }
+    presetManager.apply();
+    const data = presetManager.selectedPreset.data;
+    disablePresetControlElements(true);
+    kinklist.parseKinklistSettings(data);
+    disablePresetControlElements(false);
+    closeOverlayEventHandler(event);
+  }
+  function presetSelectorElementEventHandler(event) {
+    presetManager.select(event.target.value);
+    updatePresetOverlayState();
+  }
+
   function startButtonEventHandler() {
     if (!carousel) {
       carousel = new Carousel(kinklist);
@@ -1338,28 +1539,50 @@ function init() {
       element = element.parentElement;
     }
     fadeOut(element);
+    document.body.focus();
+    closeOverlayPostprocessing(element);
+  }
+  function closeOverlayPostprocessing(element) {
+    switch (element) {
+      case presetOverlayElement:
+        presetManager.cancel();
+        break;
+    }
   }
 
-  [
-   [generateButtonElement, generateButtonEventHandler],
-   [exportButtonElement, exportButtonEventHandler],
-   //[settingsButtonElement, settingsButtonEventHandler],
-   //[settingsConfirmButtonElement, settingsConfirmButtonEventHandler],
-   [startButtonElement, startButtonEventHandler],
-   [resetButtonElement, resetButtonEventHandler],
-   [closeOverlayButtonElements, closeOverlayEventHandler],
-   [overlayElements, fadeOutEventHandler],
-   [overlayChildrenElements, dontPropagate],
-   [presetSettingsButtonElement, presetSettingsButtonEventHandler],
-  ].forEach(([element, handler]) => {
-    const attachHandler = (e, h) => e.addEventListener("mousedown", h);
-    if (element instanceof NodeList) {
-      element.forEach(e => attachHandler(e, handler));
-    } else {
-      attachHandler(element, handler);
-    }
-  });
-  document.addEventListener("keydown", keyboardEventHandler);
+  Object.entries({
+    mousedown: [
+      [generateButtonElement, generateButtonEventHandler],
+      [exportButtonElement, exportButtonEventHandler],
+      [startButtonElement, startButtonEventHandler],
+      [resetButtonElement, resetButtonEventHandler],
+      [closeOverlayButtonElements, closeOverlayEventHandler],
+      [overlayElements, closeOverlayEventHandler],
+      [overlayChildrenElements, dontPropagate],
+      [presetSettingsButtonElement, presetSettingsButtonEventHandler],
+      [presetCreateButtonElement, presetCreateButtonEventHandler],
+      [presetRenameButtonElement, presetRenameButtonEventHandler],
+      [presetDuplicateButtonElement, presetDuplicateButtonEventHandler],
+      [presetDeleteButtonElement, presetDeleteButtonEventHandler],
+      [presetSaveButtonElement, presetSaveButtonEventHandler],
+      [presetSelectButtonElement, presetSelectButtonEventHandler],
+    ],
+    keydown: [
+      [document, keyboardEventHandler],
+    ],
+    change: [
+      [presetSelectorElement, presetSelectorElementEventHandler],
+    ],
+  }).forEach(([event, elementHandlersArray]) => {
+    elementHandlersArray.forEach(([element, handler]) => {
+      const attachHandler = (e, h) => e.addEventListener(event, h);
+      if (element instanceof NodeList) {
+        element.forEach(e => attachHandler(e, handler));
+      } else {
+        attachHandler(element, handler);
+      }
+    });
+  })
 }
 
 function attemptInit() {

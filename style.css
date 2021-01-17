@@ -33,7 +33,7 @@ body {
 	background-color: var(--theme-color-background);
 }
 
-header {
+.body header {
 	display: grid;
 	grid-template-columns:
 		var(--title-width)
@@ -405,7 +405,7 @@ td {
   width: 36px;
   height: 36px;
   opacity: 0.65;
-  outline-style: none!important;
+  transition: opacity 0.2s;
 }
 .close-overlay:hover,
 .close-overlay:focus {
@@ -458,24 +458,6 @@ td {
 }
 #CarouselColumn:not(:empty):after {
 	content: ")";
-}
-
-#SettingsKinklistText {
-	box-sizing: border-box;
-	/*margin-bottom: 10px;*/
-	padding: 10px;
-	border-radius: 5px;
-	flex: 1 1 auto;
-	font-family: monospace, "Courier New", Courier;
-	resize: none;
-}
-#SettingsConfirmButton {
-	flex: 0 0 30px;
-	text-transform: uppercase;
-	color: white;
-	font-size: 18px;
-	border-radius: 5px;
-	background-color: var(--theme-color-main);
 }
 
 @keyframes fade {
@@ -558,9 +540,10 @@ footer img {
 }
 
 .preset-background {
-	display: flex;
-	flex-flow: column;
-	align-content: center;
+	display: grid;
+	grid-auto-flow: row;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: repeat(3, min-content) auto min-content;
 	box-sizing: border-box;
 	width: auto;
 	flex: 1 1 auto;
@@ -575,6 +558,19 @@ footer img {
 	flex: 1 1 auto;
 	border-radius: 8px;
 	font-size: 20px;
+	transition: box-shadow 0.2s;
+}
+#PresetSelector:focus {
+	outline: none;
+	box-shadow: 0 0 0 2px black;
+}
+#PresetTextarea {
+	box-sizing: border-box;
+	grid-column: span 2;
+	padding: 10px;
+	border-radius: 5px;
+	font-family: monospace, "Courier New", Courier;
+	resize: none;
 }
 
 .preset-background > button {
@@ -582,17 +578,23 @@ footer img {
 	border-radius: 5px;
 	padding: 10px;
 	font-size: 20px;
-	transition: background-color 0.2s;
+	transition: filter 0.2s;
 }
-.preset-background > button:hover {
-	background-color: var(--theme-color-button-dark-hover);
+.preset-background > button:hover,
+.preset-background > button:disabled,
+.preset-background > button:focus {
+	filter: opacity(80%);
 }
 .preset-header {
+	grid-column: span 2;
 	display: flex;
 	flex-flow: row nowrap;
 	grid-gap: 10px;
 	margin-bottom: 15px;
 	margin-right: -10px;
+}
+#PresetSelect {
+	background-color: var(--theme-color-main);
 }
 
 
@@ -605,7 +607,7 @@ footer img {
 		grid-column: 2 / 3;
 		justify-content: flex-end;
 	}
-	header {
+	.body header {
 		grid-template-columns:
 			min-content
 			minmax(calc((var(--button-size) + var(--button-margin))
