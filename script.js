@@ -49,8 +49,9 @@ function createHTMLElement(cssSelector, inner, attributes) {
 }
 
 function removeInnerNodes(element) {
-  while (element.firstChild)
+  while (element.firstChild) {
     element.removeChild(element.firstChild);
+  }
 }
 
 function capitalize(str) {
@@ -151,11 +152,60 @@ function focus(element) {
   window.setTimeout(() => element.focus(), 0);
 }
 
+function binarySearch(min, max, searchFunction) {
+  while (min < max) {
+    const mid = Math.floor((min + max) / 2);
+    if (searchFunction(mid)) {
+      max = mid;
+    } else {
+      min = mid + 1;
+    }
+  }
+  return min;
+}
+
+function partitionIntoColumns(heights, amount) {
+  function partitionUnder(heights, maxHeight) {
+    const columns = [];
+    let columnHeight = 0;
+    for (let i = 0; i < heights.length; i++) {
+      if (columnHeight + heights[i] > maxHeight) {
+        columnHeight = 0;
+        columns.push(i);
+      }
+      columnHeight += heights[i];
+    }
+    columns.push(heights.length);
+    return columns;
+  }
+
+  function canPartitionUnder(heights, amount, maxHeight) {
+    return partitionUnder(heights, maxHeight).length <= amount;
+  }
+
+  const maxHeight = heights.reduce((x, y) => Math.max(x, y));
+  const totalHeight = heights.reduce((x, y) => x + y);
+  const searchFunction = canPartitionUnder.bind(null, heights, amount);
+  const target = binarySearch(maxHeight, totalHeight, searchFunction);
+
+  return partitionUnder(heights, target);
+}
+
+function spreadAcrossColumns(array, partitioning) {
+  const columns = [];
+  let start = 0;
+  for (let end of partitioning) {
+    columns.push(array.slice(start, end));
+    start = end;
+  }
+  return columns;
+}
+
 
 const cssStylesheet = document.styleSheets[0];
 
 const defaultSettings = {
-  selectionOptions: [
+  legend: [
     ['Not Entered', '#FFFFFF'],
     ['Favorite'   , '#6DB5FE'],
     ['Like'       , '#23FD22'],
@@ -163,7 +213,7 @@ const defaultSettings = {
     ['Maybe'      , '#DB6C00'],
     ['No'         , '#920000'],
   ],
-  kinklistText: "#Bodies\n(General)\n* Skinny\n* Chubby\n* Small breasts\n* Large breasts\n* Small cocks\n* Large cocks\n\n#Clothing\n(Self, Partner)\n* Clothed sex\n* Lingerie\n* Stockings\n* Heels\n* Leather\n* Latex\n* Uniform / costume\n* Cross-dressing\n\n#Groupings\n(General)\n* You and 1 male\n* You and 1 female\n* You and MtF trans\n* You and FtM trans\n* You and 1 male, 1 female\n* You and 2 males\n* You and 2 females\n* Orgy\n\n#General\n(Giving, Receiving)\n* Romance / Affection\n* Handjob / fingering\n* Blowjob\n* Deep throat\n* Swallowing\n* Facials\n* Cunnilingus\n* Face-sitting\n* Edging\n* Teasing\n* JOI, SI\n\n#Ass play\n(Giving, Receiving)\n* Anal toys\n* Anal sex, pegging\n* Rimming\n* Double penetration\n* Anal fisting\n\n#Restrictive\n(Self, Partner)\n* Gag\n* Collar\n* Leash\n* Chastity\n* Bondage (Light)\n* Bondage (Heavy)\n* Encasement\n\n#Toys\n(Self, Partner)\n* Dildos\n* Plugs\n* Vibrators\n* Sounding\n\n#Domination\n(Dominant, Submissive)\n* Dominant / Submissive\n* Domestic servitude\n* Slavery\n* Pet play\n* DD/lg, MD/lb\n* Discipline\n* Begging\n* Forced orgasm\n* Orgasm control\n* Orgasm denial\n* Power exchange\n\n#No consent\n(Aggressor, Target)\n* Non-con / rape\n* Blackmail / coercion\n* Kidnapping\n* Drugs / alcohol\n* Sleep play\n\n#Taboo\n(General)\n* Incest\n* Ageplay\n* Interracial / Raceplay\n* Bestiality\n* Necrophilia\n* Cheating\n* Exhibitionism\n* Voyeurism\n\n#Surrealism\n(Self, Partner)\n* Futanari\n* Furry\n* Vore\n* Transformation\n* Tentacles\n* Monster or Alien\n\n#Fluids\n(General)\n* Blood\n* Watersports\n* Scat\n* Lactation\n* Diapers\n* Cum play\n\n#Degradation\n(Giving, Receiving)\n* Glory hole\n* Name calling\n* Humiliation\n\n#Touch & Stimulation\n(Actor, Subject)\n* Cock/Pussy worship\n* Ass worship\n* Foot play\n* Tickling\n* Sensation play\n* Electro stimulation\n\n#Misc. Fetish\n(Giving, Receiving)\n* Fisting\n* Gangbang\n* Breath play\n* Impregnation\n* Pregnancy\n* Feminization\n* Cuckold / Cuckquean\n\n#Pain\n(Giving, Receiving)\n* Light pain\n* Heavy pain\n* Nipple clamps\n* Clothes pins\n* Caning\n* Flogging\n* Beating\n* Spanking\n* Cock/Pussy slapping\n* Cock/Pussy torture\n* Hot Wax\n* Scratching\n* Biting\n* Cutting",
+  data: "#Bodies\n(General)\n* Skinny\n* Chubby\n* Small breasts\n* Large breasts\n* Small cocks\n* Large cocks\n\n#Clothing\n(Self, Partner)\n* Clothed sex\n* Lingerie\n* Stockings\n* Heels\n* Leather\n* Latex\n* Uniform / costume\n* Cross-dressing\n\n#Groupings\n(General)\n* You and 1 male\n* You and 1 female\n* You and MtF trans\n* You and FtM trans\n* You and 1 male, 1 female\n* You and 2 males\n* You and 2 females\n* Orgy\n\n#General\n(Giving, Receiving)\n* Romance / Affection\n* Handjob / fingering\n* Blowjob\n* Deep throat\n* Swallowing\n* Facials\n* Cunnilingus\n* Face-sitting\n* Edging\n* Teasing\n* JOI, SI\n\n#Ass play\n(Giving, Receiving)\n* Anal toys\n* Anal sex, pegging\n* Rimming\n* Double penetration\n* Anal fisting\n\n#Restrictive\n(Self, Partner)\n* Gag\n* Collar\n* Leash\n* Chastity\n* Bondage (Light)\n* Bondage (Heavy)\n* Encasement\n\n#Toys\n(Self, Partner)\n* Dildos\n* Plugs\n* Vibrators\n* Sounding\n\n#Domination\n(Dominant, Submissive)\n* Dominant / Submissive\n* Domestic servitude\n* Slavery\n* Pet play\n* DD/lg, MD/lb\n* Discipline\n* Begging\n* Forced orgasm\n* Orgasm control\n* Orgasm denial\n* Power exchange\n\n#No consent\n(Aggressor, Target)\n* Non-con / rape\n* Blackmail / coercion\n* Kidnapping\n* Drugs / alcohol\n* Sleep play\n\n#Taboo\n(General)\n* Incest\n* Ageplay\n* Interracial / Raceplay\n* Bestiality\n* Necrophilia\n* Cheating\n* Exhibitionism\n* Voyeurism\n\n#Surrealism\n(Self, Partner)\n* Futanari\n* Furry\n* Vore\n* Transformation\n* Tentacles\n* Monster or Alien\n\n#Fluids\n(General)\n* Blood\n* Watersports\n* Scat\n* Lactation\n* Diapers\n* Cum play\n\n#Degradation\n(Giving, Receiving)\n* Glory hole\n* Name calling\n* Humiliation\n\n#Touch & Stimulation\n(Actor, Subject)\n* Cock/Pussy worship\n* Ass worship\n* Foot play\n* Tickling\n* Sensation play\n* Electro stimulation\n\n#Misc. Fetish\n(Giving, Receiving)\n* Fisting\n* Gangbang\n* Breath play\n* Impregnation\n* Pregnancy\n* Feminization\n* Cuckold / Cuckquean\n\n#Pain\n(Giving, Receiving)\n* Light pain\n* Heavy pain\n* Nipple clamps\n* Clothes pins\n* Caning\n* Flogging\n* Beating\n* Spanking\n* Cock/Pussy slapping\n* Cock/Pussy torture\n* Hot Wax\n* Scratching\n* Biting\n* Cutting",
   username: "Anonymous",
 }
 
@@ -179,25 +229,230 @@ class KinklistError extends Error {
   }
 }
 
-class SelectionOption {
-  constructor(name, color, selection) {
-    this.name = name;
-    this.color = color;
-    this.element = this.createElement();
-    this.selection = selection;
+
+
+class Interface {
+  constructor(object) {
+    this.object = object;
+    this.prefix = '';
+  }
+
+  get element() {
+    if (!this._element) {
+      this._element = this.createElement();
+    }
+    return this._element;
+  }
+  set element(element) {
+    this._element = element;
   }
 
   get cssClassName() {
-  	return toCSSClassName(this.name);
+    return this.prefix + toCSSClassName(this.object.name);
   }
 
-  createElement() {
-    return createHTMLElement(`button.circle.${this.cssClassName}`, null,
-        {title: this.name});
+  createElement() {return null} // Inherited classes need to define this method.
+
+  refresh() {
+    if (this._element) {
+      const newElement = this.createElement();
+      if (this.element.parentNode) {
+        this.element.parentNode.replaceChild(newElement, this.element);
+      }
+      this.element = newElement;
+    }
+  }
+}
+class SelectionOptionInterface extends Interface {
+  constructor(selectionOption) {
+    super(selectionOption);
+    this.prefix = "option-";
   }
 
   get cssRule() {
-    return `.${this.cssClassName} {background-color: ${this.color};}`
+    return `.${this.cssClassName} {background-color: ${this.object.color};}`;
+  }
+
+  createElement() {
+    const tag = `button.circle.${this.cssClassName}` +
+                `[title=${this.object.name}]`
+    const element = createHTMLElement(tag);
+    return element;
+  }
+}
+class SelectionInterface extends Interface {
+  constructor(selection) {
+    super(selection);
+    this.prefix = "selection";
+  }
+
+  createElement() {
+    const selection = this.object;
+    for (let selectionOption of selection.options) {
+      selectionOption.interface.element.addEventListener('mousedown', () => {
+        if (selection.value == selectionOption) {
+          selection.deselect();
+        } else {
+          selection.updateSelection(selectionOption);
+        }
+      });
+    }
+    const selectionOptionElements =
+        selection.options.map(selectionOption =>
+                              selectionOption.interface.element);
+    const element = createHTMLElement("div.selection", selectionOptionElements);
+    return element;
+  }
+
+  update() {
+    this.object.options
+        .map(selectionOption => selectionOption.interface.element)
+        .forEach((element) => {
+      element.classList.remove("selected");
+    });
+    if (this.object.value) {
+      this.object.value.interface.element.classList.add("selected");
+    }
+  }
+}
+class KinkInterface extends Interface {
+  constructor(kink) {
+    super(kink);
+    this.prefix = "kink-"
+  }
+
+  createElement() {
+    const cellElements = [];
+    const selections = this.object.selections;
+    for (let selection of selections) {
+      cellElements.push(createHTMLElement("td", selection.interface.element));
+    }
+    cellElements.push(createHTMLElement("td", this.object.name));
+    const element = createHTMLElement(`tr.kinkrow.${this.cssClassName}`,
+                                      cellElements);
+    return element;
+  }
+}
+class CategoryInterface extends Interface {
+  constructor(category) {
+    super(category);
+    this.prefix = "cat-";
+    this.element = this.createElement();
+  }
+
+  get height() {
+    return this.calculateHeight();
+  }
+
+  createTableElement() {
+    const classedTh = (name) => name ? "th.selection-column" : "th";
+    const headerCellElements = [...this.object.columnNames, '']
+          .map(name => createHTMLElement(classedTh(name), name));
+    const theadElement = createHTMLElement("thead", headerCellElements);
+    const tbodyElement = createHTMLElement("tbody",
+              this.object.kinks.map(kink => kink.interface.element));
+    const tableElement = createHTMLElement("table.kinkGroup",
+                                           [theadElement, tbodyElement]);
+    return tableElement;
+  }
+
+  createElement() {
+    const tableElement = this.createTableElement();
+    const titleElement = createHTMLElement("h2", this.name);
+    const divElement =
+        createHTMLElement(`div.kinkCategory.${this.cssClassName}}`,
+                          [titleElement, tableElement]);
+    return divElement;
+  }
+
+  calculateHeight(force) {
+    let height;
+    if (this.element.clientHeight) {
+      height = this.element.clientHeight;
+    } else if (force) {
+      const clone = this.element.cloneNode(true);
+      clone.style.visibility = "hidden";
+      document.body.append(clone);
+      height = clone.clientHeight;
+      clone.remove(); 
+    } else {
+      const margins = 20;
+      const h2 = 27;
+      const tableRow = 25;
+      height = margins + h2 + tableRow * (this.object.kinks.length + 1);
+    }
+    return height;
+  }
+
+  refresh() {
+    super.refresh();
+    this.calculateHeight();
+  }
+}
+class KinklistInterface extends Interface {
+  constructor(kinklist) {
+    super(kinklist);
+    this.hasCategoriesChanged = false;
+    this.element = document.querySelector("#Kinklist");
+  }
+
+  createElement() {
+    const columnAmount =
+          Math.min(4, Math.floor((document.body.scrollWidth - 20) / 400) || 1);
+    const categories = this.object.categories;
+    const columns = [];
+    if (categories.length) {
+      const categoryHeights =
+            categories.map(category => category.interface.height);
+      const partitioning = partitionIntoColumns(categoryHeights, columnAmount);
+      columns.push(...spreadAcrossColumns(categories, partitioning));
+    }
+
+    const categoryElements = columns.map(column => {
+      return column.map(category => category.interface.element);
+    });
+    const columnElements =
+          categoryElements.map(column => createHTMLElement("div", column));
+    const element = createHTMLElement("div#Kinklist", columnElements);
+    return element;
+  }
+
+  appendCSSRuleToStylesheet(rule) {
+    cssStylesheet.insertRule(rule, 0);
+  }
+
+  updateColors() {
+    const legend = this.object.legend
+          .map(([name, color]) => new SelectionOption(name, color));
+    legend
+        .map(option => option.interface.cssRule)
+        .forEach(this.appendCSSRuleToStylesheet);
+  }
+
+  updateLegend() {
+    const selectionOptions = this.object.legend
+          .map(option => new SelectionOption(...option));
+    const legendOptionElements = selectionOptions.map(option => {
+      const legendText = createHTMLElement("span.selection-name", option.name);
+      const legendMarker =
+          createHTMLElement(`span.circle.${option.interface.cssClassName}`);
+      const optionDiv = createHTMLElement("div.selection",
+                                          [legendMarker, legendText]);
+      return optionDiv;
+    });
+    const legendElement = document.querySelector(".legend");
+    removeInnerNodes(legendElement);
+    legendElement.append(...legendOptionElements);
+  }
+}
+
+
+class SelectionOption {
+  constructor(name, color, selection) {
+    this.selection = selection;
+    this.name = name;
+    this.color = color;
+    this.interface = new SelectionOptionInterface(this);
   }
 
   equals(selectionOption) {
@@ -207,59 +462,48 @@ class SelectionOption {
 }
 
 class Selection {
-  constructor(selectionOptions, kink) {
-    this.options = selectionOptions.slice()
-                   .map(option => new SelectionOption(...option, this));
-    this.value = this.options[0];
-    this.element = this.createElement();
+  constructor(legend, kink) {
     this.kink = kink;
+    this.options = legend
+                   .map(option => new SelectionOption(...option, this));
+    this._value = null;
+    this.interface = new SelectionInterface(this);
   }
 
-  get index() {
-    return this.options.findIndex(value => value == this.value);
+  get value() {return this._value};
+  set value(value) {
+    if (!(this.options.includes(value) || value == null)) {
+      throw new KinklistError("Illegal value.");
+    }
+    this._value = value;
+    this.interface.update();
+  }
+  get apparentValue() {
+    return this._value || this.options[0];
   }
 
   get columnName() {
   	const kink = this.kink;
-  	const category = kink.category;
+  	const columnNames = kink.category.columnNames;
   	let columnName = '';
-  	if (category.columnNames.length > 1) {
-  		columnName = category.columnNames[kink.selections
-  																			.findIndex(x => x == this)];
+  	if (columnNames.length > 1) {
+  		columnName = columnNames[kink.selections.findIndex(x => x == this)];
   	}
   	return columnName;
   }
 
-  createElement() {
-    const buttonElements = this.options.map(option => option.element);
-    for (let i = 0; i < this.options.length; i++) {
-      buttonElements[i].addEventListener('mousedown',
-          () => {this.updateSelection(this.options[i])});
-    }
-    const element = createHTMLElement("div.selection", buttonElements);
-    return element;
-  }
-
   updateSelection(value) {
-    this.clearSelection();
-  	if (!isNaN(Number(value))) {
-  		if (value < 0 || value >= this.options.length) {
-  			console.error("Selection value out of bounds!", value);
-  			value = 0;
-  		}
-  		this.value = this.options[+value];
-  	} else {
-	    this.value = value || this.value;
-  	}
-    const option =
-    		this.element.querySelector(`.${toCSSClassName(this.value.name)}`);
-    option.classList.add("selected");
+    if (!value instanceof SelectionOption) {
+      throw new KinklistError("Value is not SelectionOption.");
+    }
+  	if (!this.options.includes(value)) {
+      throw new KinklistError(`Selection value "${value.name}" out of bounds.`);
+    }
+    this.value = value;
   }
 
-  clearSelection() {
-    this.value = this.options[0];
-    this.element.childNodes
-                    .forEach(option => option.classList.remove("selected"));
+  deselect() {
+    this.value = null;
   }
 
   equals(selection) {
@@ -270,108 +514,62 @@ class Selection {
 }
 
 class Kink {
-  constructor(name, columnAmount, selectionOptions, category) {
+  constructor(name, category) {
+    this.category = category;
     this.name = name;
-    this.cssClassName = `kink-${toCSSClassName(name)}`;
-    this.columnAmount = columnAmount || 1;
     //this.description = description;
     this.selections = [];
-    for (let i = 0; i < this.columnAmount; i++)
-      this.selections.push(new Selection(selectionOptions, this));
-    this.element = this.createRowElement();
-    this.category = category;
+    this.interface = new KinkInterface(this);
   }
 
-  createRowElement() {
-    const cellElements = [];
-    for (let i = 0; i < this.columnAmount; i++)
-      cellElements.push(createHTMLElement("td", this.selections[i].element));
-    cellElements.push(createHTMLElement("td", this.name));
-    const element = createHTMLElement(`tr.kink-row.${this.cssClassName}`,
-                                      cellElements,);
-    return element;
+  get columnAmount() {
+    if (this.category) {
+      return this.category.columnNames.length;
+    } else return 0;
+  }
+  get category() {return this._category};
+  set category(value) {
+    if (this._category == value) return;
+    if (!value) return;
+    this._category = value;
+    this.update();
   }
 
-  link(category) {
-  	this.category = category;
-  	return this;
+  update() {
+    const newSelections = [];
+    const legend = this.category.kinklist.legend;
+    for (let i = 0; i < this.columnAmount; i++) {
+      newSelections.push(new Selection(legend, this));
+    }
+    this.selections = newSelections;
+    this.interface.refresh();
   }
 }
 
 class Category {
   constructor(name, columnNames, kinks, kinklist) {
+    this.kinklist = kinklist;
     this.name = name;
     this.columnNames = columnNames;
     this.kinks = kinks || [];
+    this.interface = new CategoryInterface(this);
+  }
+
+  get kinks() {return this._kinks};
+  set kinks(kinkObjects) {
+    this._kinks = kinkObjects;
     this.linkKinks();
-    this.tableElement = this.createTableElement();
-    this.element = this.createDivElement();
-    this.height = this.kinks.length ? this.updateHeight() : 0;
-    this.kinklist = kinklist;
-  }
-
-  createTableElement() {
-    const headerCellElements = [...this.columnNames, '']
-          .map(name => createHTMLElement("th", name,
-                            name ? {class: "selection-column"} : undefined));
-    const theadElement = createHTMLElement("thead", headerCellElements);
-    const tbodyElement = createHTMLElement("tbody",
-                                         this.kinks.map(kink => kink.element));
-    const tableElement = createHTMLElement("table.kinkGroup",
-                                           [theadElement, tbodyElement]);
-    return tableElement;
-  }
-
-  createDivElement() {
-    const titleElement = createHTMLElement("h2", this.name);
-    const divElement =
-        createHTMLElement(`div.kinkCategory.cat-${toCSSClassName(this.name)}`,
-                          [titleElement, this.tableElement]);
-    return divElement;
   }
 
   addKink(kink) {
-    this.kinks.push(kink.link(this));
-    this.tableElement.querySelector("tbody").append(kink.element);
+    kink.category = this;
+    this.kinks.push(kink);
+    this.interface.refresh();
   }
-
   updateKinks(kinkObjects) {
     this.kinks = kinkObjects;
-    const updatedTable = this.createTableElement();
-    this.tableElement.replaceWith(updatedTable);
-    this.tableElement = updatedTable;
-    this.updateHeight();
+    this.interface.refresh();
   }
-
-  updateHeight(force) {
-    let height;
-    if (this.element.clientHeight)
-      height = this.element.clientHeight;
-    if (force) {
-      const clone = this.element.cloneNode(true);
-      clone.style.visibility = "hidden";
-      document.body.append(clone);
-      height = clone.clientHeight;
-      clone.remove(); 
-    } else {
-      const margins = 20;
-      const h2 = 27;
-      const tableRow = 25;
-      height = margins + h2 + tableRow * (this.kinks.length + 1);
-    }
-    this.height = height;
-    return height;
-  }
-
-  get kinks() {
-  	return this._kinks;
-  }
-
-  set kinks(kinkObjects) {
-  	this._kinks = kinkObjects;
-  	this.linkKinks();
-  }
-
   linkKinks() {
   	for (let kink of this.kinks) {
   		kink.category = this;
@@ -380,14 +578,25 @@ class Category {
 }
 
 class Kinklist {
-  constructor(settings) {
+  constructor(preset) {
     this.categories = [];
-    this.columns = [];
     this.kinks = [];
-    this.columnHeights = [];
-    this.hasCategoriesChanged = false;
-    this.settings = settings || defaultSettings;
-    this.parseKinklistSettings();
+    this.interface = new KinklistInterface(this);
+    this.legend = preset.legend;
+    this.data = preset.data;
+  }
+
+  get data() {return this._data;}
+  get legend() {return this._legend};
+  set data(value) {
+    value = this.sanitizeKinklistSettingsInput(value);
+    this._data = value;
+    this.parseKinklistSettings(value);
+  }
+  set legend(value) {
+    this._legend = value;
+    this.interface.updateColors();
+    this.interface.updateLegend();
   }
 
   get stateString() {
@@ -409,57 +618,6 @@ class Kinklist {
     }
   }
 
-  updateColumns() {
-    const columnAmount =
-        Math.min(4, Math.floor((document.body.scrollWidth - 20) / 400) || 1);
-
-    // Category elements' margins overlap, being accounted twice. This
-    // correction value mitigates that discrepancy.
-    const overlapCorrection = -10;
-
-    const columns = [];
-    const columnHeights = [];
-    for (let i = 0; i < columnAmount; i++) columns.push([]);
-
-    this.categories.forEach(category => category.updateHeight());
-
-    const totalHeight = this.categories
-                            .reduce((pv, category) => pv + category.height, 0);
-    const goalColumnHeight = totalHeight / columnAmount;
-
-    let columnIndex = 0;
-    let currentColumnHeight = 0;
-    for (let i = 0; i < this.categories.length; i++) {
-      const category = this.categories[i];
-      columns[columnIndex].push(category);
-      currentColumnHeight += category.height + overlapCorrection;
-      if ((currentColumnHeight + category.height / 2) > goalColumnHeight) {
-        columnHeights[columnIndex] = currentColumnHeight;
-        columnIndex++;
-        currentColumnHeight = 0;
-      }
-    }
-    if (columnIndex < columnAmount)
-      columnHeights[columnAmount - 1] = currentColumnHeight;
-    this.columns = columns;
-
-    if (this.hasCategoriesChanged ||
-        this.columns.length != columnAmount ||
-        !columnHeights.every((height, index) =>
-                             height == this.columnHeights[index])
-       ) {
-      const categoryElements =
-          this.columns.map(column => 
-                           column.map(category => category.element));
-      const columnElements =
-            categoryElements.map(column => createHTMLElement("div", column));
-      const inputListElement = document.querySelector("#Kinklist");
-      removeInnerNodes(inputListElement);
-      inputListElement.append(...columnElements);
-      this.hasCategoriesChanged = false;
-    }
-  }
-
   updateKinks() {
     this.kinks = [].concat(...this.categories.map(category => category.kinks));
   }
@@ -471,72 +629,66 @@ class Kinklist {
     this.updateKinks();
   }
 
-  addCategory(...categories) {
-    this.appendCategory(...categories);
-    this.hasCategoriesChanged = true;
-  }
-
   removeCategory(...categoriesToRemove) {
     this.categories = this.categories
             .filter(category => !categoriesToRemove.includes(category));
     this.updateKinks();
-    this.hasCategoriesChanged = true;
   }
 
   flush() {
     for (let kink of this.kinks) {
       for (let selection of kink.selections) {
-        selection.clearSelection();
+        selection.deselect();
       }
     }
   }
  
   parseKinklistSettings(inputString) {
-    inputString = inputString || this.settings.kinklistText;
-    inputString = this.sanitizeKinklistSettingsInput(inputString);
-    this.settings.kinklistText = inputString;
+    if (!inputString) {
+      throw new KinklistError("Input string empty.");
+    }
     const regexp = new RegExp(/#(.+)\n\((.+)\)\n((?:\*.+\n?)+)/g);
-    let match;
-    let matches = [];
 
-    while ((match = regexp.exec(this.settings.kinklistText)) != null) {
-      match[2] = match[2].split(/,\s+/);
-      match[3] = match[3]
-                    .trim()
-                    .split('\n')
-                    .map(kinkString => kinkString.replace(/\*\s*/, ''));
-      match.shift();
-      matches.push(match);
+    let match;
+    let categories = [];
+    while ((match = regexp.exec(this.data))) {
+      const category = {};
+      category.name = match[1];
+      category.columns = match[2].split(/,\s+/);
+      category.kinks = match[3]
+          .trim()
+          .split('\n')
+          .map(kinkString => kinkString.replace(/\*\s*/, ''));
+      categories.push(category);
     }
 
     const newCategories = [];
-    const extraCategories = new Set(this.categories.slice());
+    const extraCategories = new Set(this.categories);
     const categoryNames = [];
-    matches.forEach(match => {
-      let [newCategoryName, columns, kinks] = match;
-      categoryNames.push(newCategoryName);
-      let existingCategory = this.categories
-              .find(category => category.name == newCategoryName);
+    categories.forEach(categoryData => {
+      let {name, columns, kinks} = categoryData;
+      categoryNames.push(name);
       kinks = kinks.map(kinkName => 
                         this.kinks.find(kinkObject => 
                                         kinkObject.name == kinkName)
-                          || new Kink(kinkName, columns.length,
-                                      this.settings.selectionOptions)
+                          || new Kink(kinkName)
                        );
+      let existingCategory = this.categories
+              .find(category => category.name == name);
       if (existingCategory) {
         existingCategory.updateKinks(kinks);
         extraCategories.delete(existingCategory);
       }
       else
-        newCategories.push(new Category(newCategoryName, columns, kinks, this));
+        newCategories.push(new Category(name, columns, kinks, this));
     });
     if (extraCategories) this.removeCategory(...extraCategories);
     if (newCategories) this.appendCategory(...newCategories);
-    // Sort categories in order they were specified in the file.
+    // Sort categories in order they were specified in the list.
     this.categories =
         categoryNames.map(name => this.categories
                                       .find(category => category.name == name));
-    this.updateColumns();
+    this.interface.refresh();
   }
 
   sanitizeKinklistSettingsInput(kinklistSettings) {
@@ -546,11 +698,7 @@ class Kinklist {
   }
 }
 
-class KinklistElementGenerator {
-  constructor(kinklist) {
-    this.kinklist = kinklist;
-  }
-}
+
 
 class Font {
   constructor(fontString) {
@@ -585,7 +733,7 @@ class KinklistCanvasDrawerCircleSettings {
 class KinklistCanvasDrawer {
   constructor(kinklistObject, username) {
     this.kinklist = kinklistObject;
-    this.username = username || kinklistObject.settings.username;
+    this.username = username;
     this.settings = {
       margins: {
         // Global.
@@ -725,11 +873,12 @@ class KinklistCanvasDrawer {
   }
 
   drawKink(drawcall, context = this.context) {
-    // {kinkObject: {selections[], name} / margin}
+    // {kinkObject: {selections[]: {apparentValue: {color}}, name} / margin}
     const circle = this.settings.circle;
     for (const selection of drawcall.kinkObject.selections) {
       const circleDrawcall = 
-          new Drawcall(drawcall.x, drawcall.y, {color: selection.value.color});
+          new Drawcall(drawcall.x, drawcall.y,
+                       {color: selection.apparentValue.color});
       this.drawCircle(circleDrawcall, context);
       drawcall.x += circle.size * 2;
     }
@@ -783,8 +932,6 @@ class KinklistCanvasDrawer {
     const font = this.settings.text;
     const columns =
         this.spreadCategoriesAcrossColumns(kinklistObject.categories);
-    console.log(kinklistObject);
-    console.log(columns);
     const columnHeights =
         columns.map(column => column.map(category =>
                                this.calculateCategoryHeight
@@ -812,14 +959,14 @@ class KinklistCanvasDrawer {
     let legendX = this.settings.canvas.width
                 - margins.right
                 - this.settings.legend.width
-                    * kinklistObject.settings.selectionOptions.length
+                    * kinklistObject.legend.length
                 + this.settings.circle.size;
     let legendY = y + this.settings.circle.size;
-    for (let [name, color] of kinklistObject.settings.selectionOptions) {
+    for (let [name, color] of kinklistObject.legend) {
       let legendDrawcall =
           new Drawcall(legendX, legendY,
                        {kinkObject: {
-                          selections: [{value: {color: color}}],
+                          selections: [{apparentValue: {color: color}}],
                           name: name,
                         },
                         font: font.legend,
@@ -928,7 +1075,10 @@ class Carousel {
   }
 
   select(optionNumber) {
-  	this.selections[this.index].updateSelection(optionNumber);
+    const selection = this.selections[this.index];
+    console.log(selection);
+    const option = selection.options[optionNumber];
+  	selection.updateSelection(option);
   	this.moveIndexForward();
   }
 
@@ -946,7 +1096,7 @@ class Carousel {
   	const oldIndex = this.index || 0;
   	this.index =
   			this.selections.findIndex(selection =>
-  			                          selection.value.name == "Not Entered");
+  			     selection.apparentValue.name == "Not Entered");
   	if (this.index == -1) this.index = oldIndex;
   	this.previousSelection = this.selection;
   }
@@ -962,7 +1112,7 @@ class Carousel {
   	for (let i = 0; i < selection.options.length; i++) {
   		const option = selection.options[i];
 	  	const circleElement =
-	  			createHTMLElement(`span.circle.${option.cssClassName}`);
+	  			createHTMLElement(`span.circle.${option.interface.cssClassName}`);
 	  	const nameElement =
 	  			createHTMLElement("span.legend-text", option.name);
 	  	const buttonNumberTextElement =
@@ -1002,11 +1152,15 @@ class Carousel {
         .textContent = selection.columnName;
   	const selectedElement = this.rootElement.querySelector(".selected");
   	if (selectedElement) selectedElement.classList.remove("selected");
-  	const newSelectedElement =
-  			this.rootElement
-            .querySelector(`#CarouselCurrent .${selection.value.cssClassName}`)
-  					.parentElement;
-  	newSelectedElement.classList.add("selected");
+    if (selection.value) {
+      const selectionCSSClassName =
+            selection.value.interface.cssClassName;
+    	const newSelectedElement =
+    			this.rootElement
+              .querySelector(`#CarouselCurrent .${selectionCSSClassName}`)
+    					.parentElement;
+    	newSelectedElement.classList.add("selected");
+    }
   }
 
   updateInputPreviousElement() {
@@ -1049,8 +1203,10 @@ class Carousel {
 		const categoryName = selection.kink.category.name;
 		const columnName = selection.columnName;
 		const kinkName = selection.kink.name;
+    const selectionCSSClassName =
+          selection.apparentValue.interface.cssClassName;
 		const choiceElement =
-				createHTMLElement(`span.circle.${selection.value.cssClassName}`);
+				createHTMLElement(`span.circle.${selectionCSSClassName}`);
 		const categoryElement =
 				createHTMLElement("span.category", categoryName);
 		const columnElement =
@@ -1065,30 +1221,6 @@ class Carousel {
 				                  	kinkElement]);
 		return kinkSimpleDivElement;
   }
-}
-
-
-
-function appendCSSRuleToStylesheet(rule) {
-  cssStylesheet.insertRule(rule, cssStylesheet.cssRules.length);
-}
-
-function generateLegend(selectionOptions) {
-  const legendOptionElements = selectionOptions.map(option => {
-    const legendText = createHTMLElement("span.selection-name", option.name);
-    const legendMarker =
-        createHTMLElement(`span.circle.${toCSSClassName(option.name)}`);
-    const optionDiv = createHTMLElement("div.selection",
-                                        [legendMarker, legendText]);
-    return optionDiv;
-  });
-  const legendElement = document.querySelector(".legend");
-  removeInnerNodes(legendElement);
-  legendElement.append(...legendOptionElements);
-}
-
-function generateSelectionOptionCSS(selectionOptions) {
-  selectionOptions.forEach(option => appendCSSRuleToStylesheet(option.cssRule));
 }
 
 function uploadToImgur(blob, filename) {
@@ -1122,18 +1254,62 @@ function uploadToImgur(blob, filename) {
   });
 }
 
+
+
 class Preset {
-  constructor(displayName, data) {
-    this.displayName = displayName;
-    this.data = data || '';
+  constructor(displayName, manager, data, legend) {
+    this.manager = manager;
+    this._displayName = displayName;
+    this.initialize(data, legend);
+    this.locked = manager.storage.defaults
+        .presetDisplayNames.includes(displayName);
   }
 
+  initialize(data, legend) {
+    const storage = this.manager.storage;
+    this._data = data || storage.retrieve(this.internalPresetDataName);
+    this._legend = legend || storage.retrieve(this.internalPresetLegendName);
+  }
+
+  checkLock() {
+    if (this.locked) {
+      const text = `Attempted to modify locked preset "${this.displayName}".`;
+      throw new KinklistError(text);
+    }
+  }
+
+  cleanup() {
+    this.manager.storage.remove(this.internalPresetDataName);
+    this.manager.storage.remove(this.internalPresetLegendName);
+  }
+
+  get displayName() {return this._displayName};
+  get data() {return this._data};
+  get legend() {return this._legend};
+  set displayName(value) {
+    this.checkLock();
+    this.manager.delete(this);
+    this._displayName = value;
+    this.manager.add(this);
+  }
+  set data(value) {
+    this.checkLock();
+    this._data = value;
+    this.manager.save();
+  }
+  set legend(value) {
+    this.checkLock();
+    this._legend = value;
+    this.manager.save();
+  }
   get name() {
     return toCSSClassName(this.displayName);
   }
-
-  get internalName() {
+  get internalPresetDataName() {
     return `--preset-${this.name}`;
+  }
+  get internalPresetLegendName() {
+    return `--legend-${this.name}`;
   }
 }
 
@@ -1143,8 +1319,7 @@ class PresetManager {
     this.presets = new Map();
     const presetDisplayNames = this.storage.retrieve("presetDisplayNames");
     presetDisplayNames.forEach(displayName => {
-      const preset = new Preset(displayName);
-      preset.data = this.storage.retrieve(preset.internalName);
+      const preset = new Preset(displayName, this);
       this.presets.set(preset.name, preset);
     });
     this.currentPreset = this.get(this.storage.retrieve("currentPreset"));
@@ -1166,40 +1341,41 @@ class PresetManager {
     return this.presets.get(name);
   }
 
-  create(displayName, data = '') {
+  create(displayName, data = '', legend = defaultSettings.legend) {
     const name = toCSSClassName(displayName);
-    this.sanitizeName(name);
+    this.sanitizeInput(name);
     if (this.presets.has(name)) {
       throw new KinklistError(`Preset "${name}" already exists.`);
     }
-    this.presets.set(name, new Preset(displayName, data));
+    const preset = new Preset(displayName, this, data, legend);
+    this.presets.set(name, preset);
     this.save();
   }
 
-  update(name, data) {
-    this.sanitizeName(name);
-    if (data) {
-      this.presets.get(name).data = data;
+  add(preset) {
+    const name = preset.name;
+    this.sanitizeInput(name);
+    if (this.presets.has(name)) {
+      throw new KinklistError(`Preset "${name}" already exists.`);
     }
+    this.presets.set(name, preset);
     this.save();
   }
 
-  rename(name, newDisplayName) {
+  rename(preset, newDisplayName) {
     const newName = toCSSClassName(newDisplayName);
-    this.sanitizeName(name);
-    this.sanitizeName(newName);
-    const data = this.get(name).data;
+    this.sanitizeInput(preset.name);
+    this.sanitizeInput(newName);
     if (this.presets.has(newName)) {
       throw new KinklistError(`Preset "${name}" already exists.`);
     }
-    this.delete(name);
-    this.create(newDisplayName, data);
+    this.delete(preset);
+    this.create(newDisplayName, preset.data, preset.legend);
     this.select(newName);
   }
 
-  delete(name) {
-    this.sanitizeName(name);
-    const preset = this.get(name);
+  delete(preset) {
+    this.sanitizeInput(preset);
     if (this.currentPreset == preset) {
       this.currentPreset = this.get("default");
     }
@@ -1207,7 +1383,7 @@ class PresetManager {
       this.cancel();
     }
     this.presets.delete(preset.name);
-    this.storage.remove(preset.internalName);
+    preset.cleanup();
     this.save();
   }
 
@@ -1229,7 +1405,8 @@ class PresetManager {
     this.selectedPreset = this.currentPreset;
   }
 
-  sanitizeName(name) {
+  sanitizeInput(input) {
+    let name = input instanceof Preset ? input.name : input;
     const defaultPresets = this.storage.defaults.presetList;
     if (defaultPresets.includes(name)) {
       throw new KinklistError(`Cannot modify default preset "${name}".`);
@@ -1238,26 +1415,27 @@ class PresetManager {
 
   save() {
     this.storage.store("presetDisplayNames", this.presetDisplayNameList);
-    for (const preset of this.presets.values()) {
-      this.storage.store(preset.internalName, preset.data);
+    for (let preset of this.presets.values()) {
+      this.storage.store(preset.internalPresetDataName, preset.data);
+      this.storage.store(preset.internalPresetLegendName, preset.legend);
     }
     this.storage.store("currentPreset", this.currentPreset.name);
   }
 }
 
 class StorageHandler {
-  constructor(kinklist) {
+  constructor() {
     this.defaults = {
       imgurData: {},
       presetDisplayNames: ["Default"],
       //presetList: [/* Generated automatically below. */],
-      "--preset-default": `${defaultSettings.kinklistText}`,
+      "--preset-default": defaultSettings.data,
+      "--legend-default": defaultSettings.legend,
       currentPreset: "default",
     };
     const presetList = this.defaults.presetDisplayNames
         .map(displayName => toCSSClassName(displayName));
     Object.defineProperty(this.defaults, "presetList", {value: presetList});
-    this.kinklist = kinklist;
     this.initialize();
     return this;
   }
@@ -1301,15 +1479,11 @@ class StorageHandler {
 }
 
 function init() {
-  const kinklist = new Kinklist();
-  const storageHandler = new StorageHandler(kinklist);
+  const storageHandler = new StorageHandler();
   const presetManager = new PresetManager(storageHandler);
-  
-  const selectionOptionObjects = kinklist.settings
-      .selectionOptions.map(option => new SelectionOption(...option));
-  generateLegend(selectionOptionObjects);
-  generateSelectionOptionCSS(selectionOptionObjects);
   appendCSSRuleToStylesheet("#KinklistCanvas{border:solid 1px black; width: 100%;}");
+  const currentPreset = presetManager.currentPreset;
+  const kinklist = new Kinklist(currentPreset);
 
 
 
@@ -1320,7 +1494,7 @@ function init() {
       lastResize = currentTime;
       setTimeout(() => {
         if (currentTime == lastResize) {
-          kinklist.updateColumns();
+          kinklist.interface.refresh();
         }
       }, 150)
     })
@@ -1348,7 +1522,7 @@ function init() {
   const overlayChildrenElements = document.querySelectorAll(".overlay > *");
   const overlayElements = document.querySelectorAll(".overlay");
 
-  presetTextareaElement.value = kinklist.settings.kinklistText;
+  presetTextareaElement.value = kinklist.data;
 
   // Shared variables for following event handlers.
   let kinklistCanvasDrawer;
@@ -1378,9 +1552,8 @@ function init() {
   }
   function generateButtonEventHandler() {
     const username =
-        window.prompt("Enter nickname:", kinklist.settings.username);
+        window.prompt("Enter nickname:", defaultSettings.username);
     if (username) {
-      kinklist.settings.username = username;
       kinklistCanvasDrawer = new KinklistCanvasDrawer(kinklist, username);
       kinklistCanvasDrawer.drawKinklist();
       const canvasElement = document.querySelector("#KinklistCanvas");
@@ -1471,7 +1644,8 @@ function init() {
   function presetCreateButtonEventHandler() {
     const displayName = window.prompt("Enter new preset name:");
     if (displayName) {
-      presetManager.create(displayName, presetManager.get("default").data);
+      const {data, legend} = presetManager.get("default");
+      presetManager.create(displayName, data, legend);
       const name = toCSSClassName(displayName);
       presetManager.select(name);
       updatePresetOverlayState();
@@ -1479,18 +1653,19 @@ function init() {
     }
   }
   function presetRenameButtonEventHandler() {
-    const currentName = presetManager.selectedPreset.name;
+    const selectedPreset = presetManager.selectedPreset;
     const displayName = presetManager.selectedPreset.displayName;
     const newDisplayName = window.prompt(`Rename preset "${displayName}":`);
     if (newDisplayName) {
-      presetManager.rename(currentName, newDisplayName);
+      presetManager.rename(selectedPreset, newDisplayName);
       updatePresetOverlayState();
     }
   }
   function presetDuplicateButtonEventHandler() {
     const displayName = window.prompt("Enter new preset name:");
     if (displayName) {
-      presetManager.create(displayName, presetManager.selectedPreset.data);
+      const {data, legend} = presetManager.selectedPreset;
+      presetManager.create(displayName, data, legend);
       const name = toCSSClassName(displayName);
       presetManager.select(name);
       updatePresetOverlayState();
@@ -1498,12 +1673,12 @@ function init() {
     }
   }
   function presetDeleteButtonEventHandler() {
-    presetManager.delete(presetManager.selectedPreset.name);
+    presetManager.delete(presetManager.selectedPreset);
     updatePresetOverlayState();
   }
   function presetSaveButtonEventHandler() {
     const newData = presetTextareaElement.value;
-    presetManager.update(presetManager.selectedPreset.name, newData);
+    presetManager.selectedPreset.data = newData;
   }
   function presetSelectButtonEventHandler(event) {
     try {
@@ -1516,7 +1691,7 @@ function init() {
     presetManager.apply();
     const data = presetManager.selectedPreset.data;
     disablePresetControlElements(true);
-    kinklist.parseKinklistSettings(data);
+    kinklist.data = data;
     disablePresetControlElements(false);
     closeOverlayEventHandler(event);
   }
