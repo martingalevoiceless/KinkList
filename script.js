@@ -74,27 +74,39 @@ function toCSSClassName(str) {
 
 
 function hide(element) {
-  if (element.classList.contains("unhidden")) {
-    element.classList.remove("unhidden");
-    element.classList.add("hidden");
-  } else if (element.classList.contains("visible")) {
-    element.classList.remove("visible");
-    element.classList.add("invisible");
-  } else {
-    element.classList.add("hidden");
+  const classList = element.classList;
+  const transitionMap = new Map([
+    ["hidden", "hidden"],
+    ["invisible", "invisible"],
+    ["unhidden", "hidden"],
+    ["visible", "invisible"],
+  ]);
+  for (let className of transitionMap.keys()) {
+    if (classList.contains(className)) {
+      classList.remove(className);
+      classList.add(transitionMap.get(className));
+      return;
+    }
   }
+  classList.add("hidden");
 }
 
 function unhide(element) {
-  if (element.classList.contains("hidden")) {
-    element.classList.remove("hidden");
-    element.classList.add("unhidden");
-  } else if (element.classList.contains("invisible")) {
-    element.classList.remove("invisible");
-    element.classList.add("visible");
-  } else {
-    element.classList.add("unhidden");
+  const classList = element.classList;
+  const transitionMap = new Map([
+    ["unhidden", "unhidden"],
+    ["visible", "visible"],
+    ["hidden", "unhidden"],
+    ["invisible", "visible"],
+  ]);
+  for (let className of transitionMap.keys()) {
+    if (classList.contains(className)) {
+      classList.remove(className);
+      classList.add(transitionMap.get(className));
+      return;
+    }
   }
+  classList.add("hidden");
 }
 
 function isHidden(element) {
