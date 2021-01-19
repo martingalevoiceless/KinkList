@@ -597,7 +597,10 @@ footer img {
 	background-color: var(--theme-color-main);
 }
 
-
+#KinklistCanvas {
+	border: solid 1px black;
+	width: 100%;
+}
 
 @media (max-width: 799px) {
 	.export-field, .export-field .export-link {

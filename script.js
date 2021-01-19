@@ -1481,7 +1481,6 @@ class StorageHandler {
 function init() {
   const storageHandler = new StorageHandler();
   const presetManager = new PresetManager(storageHandler);
-  appendCSSRuleToStylesheet("#KinklistCanvas{border:solid 1px black; width: 100%;}");
   const currentPreset = presetManager.currentPreset;
   const kinklist = new Kinklist(currentPreset);
 
