@@ -358,7 +358,7 @@ class CategoryInterface extends Interface {
 
   createElement() {
     const tableElement = this.createTableElement();
-    const titleElement = createHTMLElement("h2", this.name);
+    const titleElement = createHTMLElement("h2", this.object.name);
     const divElement =
         createHTMLElement(`div.kinkCategory.${this.cssClassName}}`,
                           [titleElement, tableElement]);
