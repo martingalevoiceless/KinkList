@@ -269,7 +269,7 @@ td {
 	transition: all 0.3s cubic-bezier(0, 0.5, 0.5, 1) 0.15s;
 }
 #Kinklist .selection .circle:hover {
-	opacity: 100%;
+	opacity: 70%;
 	transition-delay: 0s;
 }
 #Kinklist .selection .circle.selected,
