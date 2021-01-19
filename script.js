@@ -1076,7 +1076,6 @@ class Carousel {
 
   select(optionNumber) {
     const selection = this.selections[this.index];
-    console.log(selection);
     const option = selection.options[optionNumber];
   	selection.updateSelection(option);
   	this.moveIndexForward();
