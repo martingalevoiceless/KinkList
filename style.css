@@ -596,6 +596,9 @@ footer img {
 #PresetSelect {
 	background-color: var(--theme-color-main);
 }
+#PresetSelector option[disabled]:last-child {
+	display: none;
+}
 
 #KinklistCanvas {
 	border: solid 1px black;
