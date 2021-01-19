@@ -1708,9 +1708,17 @@ function init() {
     fadeIn(inputOverlayElement);
   }
   function keyboardEventHandler(pressed) {
-    if (carousel && carousel.enabled && Number.isInteger(+pressed.key)
-        && pressed.key < carousel.selection.options.length) {
-      carousel.select(+pressed.key);
+    if (carousel && carousel.enabled) {
+      if (Number.isInteger(+pressed.key)
+          && pressed.key < carousel.selection.options.length) {
+        carousel.select(+pressed.key);
+      } else if (["ArrowDown", "ArrowRight"].includes(pressed.key)) {
+        carousel.moveIndexForward();
+        pressed.preventDefault();
+      } else if (["ArrowUp", "ArrowLeft"].includes(pressed.key)) {
+        carousel.moveIndexBackward();
+        pressed.preventDefault();
+      }
     }
   }
   function dontPropagate(e) {
