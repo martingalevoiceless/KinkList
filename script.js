@@ -1510,7 +1510,6 @@ function init() {
     })
   })();
 
-  const kinklistElement = document.querySelector("#Kinklist");
   const exportButtonElement = document.querySelector(".export-button");
   const exportLinkElement = document.querySelector(".export-link");
   const generateButtonElement = document.querySelector(".generate-button");
@@ -1570,7 +1569,7 @@ function init() {
       if (canvasElement) {
         canvasElement.replaceWith(kinklistCanvasDrawer.canvas);
       } else {
-        kinklistElement.before(kinklistCanvasDrawer.canvas);
+        kinklist.interface.element.before(kinklistCanvasDrawer.canvas);
       }
       if (!exportButtonElement.style.display) {
         fadeIn(exportButtonElement, "inline-block");
