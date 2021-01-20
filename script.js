@@ -592,7 +592,6 @@ class Category {
 class Kinklist {
   constructor(preset) {
     this.categories = [];
-    this.kinks = [];
     this.interface = new KinklistInterface(this);
     this.legend = preset.legend;
     this.data = preset.data;
@@ -609,6 +608,11 @@ class Kinklist {
     this._legend = value;
     this.interface.updateColors();
     this.interface.updateLegend();
+  }
+  get kinks() {
+    const kinks = this.categories.map(category => category.kinks)
+          .reduce((pv, array) => pv.concat(...array), []); // Same as .flat();
+    return kinks;
   }
 
   get stateString() {
@@ -630,21 +634,15 @@ class Kinklist {
     }
   }
 
-  updateKinks() {
-    this.kinks = [].concat(...this.categories.map(category => category.kinks));
-  }
-
   appendCategory(...categories) {
     for (let category of categories) {
       this.categories.push(category);
     }
-    this.updateKinks();
   }
 
   removeCategory(...categoriesToRemove) {
     this.categories = this.categories
             .filter(category => !categoriesToRemove.includes(category));
-    this.updateKinks();
   }
 
   flush() {
