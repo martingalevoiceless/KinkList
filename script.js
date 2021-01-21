@@ -1718,7 +1718,7 @@ function init() {
       presetSaveButtonEventHandler();
     } catch (e) {
       if (e.name == "KinklistError") {
-        console.error(e);
+        //console.error(e);
       } else throw e;
     }
     presetManager.apply();
