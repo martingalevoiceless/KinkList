@@ -479,6 +479,7 @@ class Selection {
     this.options = legend
                    .map(option => new SelectionOption(...option, this));
     this._value = null;
+    this.defaultValue = new SelectionOption("Not selected", "#FFFFFF", this);
     this.interface = new SelectionInterface(this);
   }
 
@@ -491,7 +492,7 @@ class Selection {
     this.interface.update();
   }
   get apparentValue() {
-    return this._value || this.options[0];
+    return this._value || this.defaultValue;
   }
 
   get columnName() {
