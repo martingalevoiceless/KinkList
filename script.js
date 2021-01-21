@@ -1124,6 +1124,7 @@ class Carousel {
   			this.selections.findIndex(selection =>
   			     selection.apparentValue.name == "Not Entered");
   	if (this.index == -1) this.index = oldIndex;
+    if (this.index >= this.selections.length) this.index = 0;
   	this.previousSelection = this.selection;
   }
 
@@ -1724,6 +1725,7 @@ function init() {
     const preset = presetManager.selectedPreset;
     disablePresetControlElements(true);
     kinklist.preset = preset;
+    carousel.refresh();
     disablePresetControlElements(false);
     closeOverlayEventHandler(event);
   }
