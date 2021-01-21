@@ -226,6 +226,7 @@ const defaultSettings = {
     ['No'         , '#920000'],
   ],
   data: "#Bodies\n(General)\n* Skinny\n* Chubby\n* Small breasts\n* Large breasts\n* Small cocks\n* Large cocks\n\n#Clothing\n(Self, Partner)\n* Clothed sex\n* Lingerie\n* Stockings\n* Heels\n* Leather\n* Latex\n* Uniform / costume\n* Cross-dressing\n\n#Groupings\n(General)\n* You and 1 male\n* You and 1 female\n* You and MtF trans\n* You and FtM trans\n* You and 1 male, 1 female\n* You and 2 males\n* You and 2 females\n* Orgy\n\n#General\n(Giving, Receiving)\n* Romance / Affection\n* Handjob / fingering\n* Blowjob\n* Deep throat\n* Swallowing\n* Facials\n* Cunnilingus\n* Face-sitting\n* Edging\n* Teasing\n* JOI, SI\n\n#Ass play\n(Giving, Receiving)\n* Anal toys\n* Anal sex, pegging\n* Rimming\n* Double penetration\n* Anal fisting\n\n#Restrictive\n(Self, Partner)\n* Gag\n* Collar\n* Leash\n* Chastity\n* Bondage (Light)\n* Bondage (Heavy)\n* Encasement\n\n#Toys\n(Self, Partner)\n* Dildos\n* Plugs\n* Vibrators\n* Sounding\n\n#Domination\n(Dominant, Submissive)\n* Dominant / Submissive\n* Domestic servitude\n* Slavery\n* Pet play\n* DD/lg, MD/lb\n* Discipline\n* Begging\n* Forced orgasm\n* Orgasm control\n* Orgasm denial\n* Power exchange\n\n#No consent\n(Aggressor, Target)\n* Non-con / rape\n* Blackmail / coercion\n* Kidnapping\n* Drugs / alcohol\n* Sleep play\n\n#Taboo\n(General)\n* Incest\n* Ageplay\n* Interracial / Raceplay\n* Bestiality\n* Necrophilia\n* Cheating\n* Exhibitionism\n* Voyeurism\n\n#Surrealism\n(Self, Partner)\n* Futanari\n* Furry\n* Vore\n* Transformation\n* Tentacles\n* Monster or Alien\n\n#Fluids\n(General)\n* Blood\n* Watersports\n* Scat\n* Lactation\n* Diapers\n* Cum play\n\n#Degradation\n(Giving, Receiving)\n* Glory hole\n* Name calling\n* Humiliation\n\n#Touch & Stimulation\n(Actor, Subject)\n* Cock/Pussy worship\n* Ass worship\n* Foot play\n* Tickling\n* Sensation play\n* Electro stimulation\n\n#Misc. Fetish\n(Giving, Receiving)\n* Fisting\n* Gangbang\n* Breath play\n* Impregnation\n* Pregnancy\n* Feminization\n* Cuckold / Cuckquean\n\n#Pain\n(Giving, Receiving)\n* Light pain\n* Heavy pain\n* Nipple clamps\n* Clothes pins\n* Caning\n* Flogging\n* Beating\n* Spanking\n* Cock/Pussy slapping\n* Cock/Pussy torture\n* Hot Wax\n* Scratching\n* Biting\n* Cutting",
+  state: '',
   username: "Anonymous",
 }
 
@@ -490,6 +491,8 @@ class Selection {
     }
     this._value = value;
     this.interface.update();
+    const event = new CustomEvent("kinklist-stateUpdate", {bubbles: true});
+    this.interface.element.dispatchEvent(event);
   }
   get apparentValue() {
     return this._value || this.defaultValue;
@@ -506,6 +509,10 @@ class Selection {
   }
 
   updateSelection(value) {
+    if (value == null) {
+      this.value = null;
+      return;
+    }
     if (!value instanceof SelectionOption) {
       throw new KinklistError("Value is not SelectionOption.");
     }
@@ -594,12 +601,18 @@ class Kinklist {
   constructor(preset) {
     this.categories = [];
     this.interface = new KinklistInterface(this);
-    this.legend = preset.legend;
-    this.data = preset.data;
+    this.preset = preset;
   }
 
-  get data() {return this._data;}
+  get preset() {return this._preset};
+  get data() {return this._data};
   get legend() {return this._legend};
+  set preset(value) {
+    this._preset = value;
+    this.legend = value.legend;
+    this.data = value.data;
+    this.state = value.state;
+  }
   set data(value) {
     value = this.sanitizeKinklistSettingsInput(value);
     this._data = value;
@@ -616,23 +629,26 @@ class Kinklist {
     return kinks;
   }
 
-  get stateString() {
+  get state() {
     const encodedSelections = [];
     for (let kink of this.kinks) {
       for (let selection of kink.selections) {
-        encodedSelections.push(selection.index);
+        const index = selection.options.indexOf(selection.value) + 1;
+        encodedSelections.push(index);
       }
     }
-    return encodedSelections.join('');
+    return (encodedSelections.join('').match(/\d*[1-9]/) || [""])[0];
   }
-
-  set stateString(kinklistString) {
-    const encodedSelections = kinklistString.split('');
+  set state(stateString) {
+    const encodedSelections = stateString.split('');
     for (let kink of this.kinks) {
       for (let selection of kink.selections) {
-        selection.updateSelection(encodedSelections.shift());
+        const index = encodedSelections.shift() || 0;
+        const value = index ? selection.options[index - 1] : null;
+        selection.updateSelection(value);
       }
     }
+    this.preset.state = stateString;
   }
 
   appendCategory(...categories) {
@@ -1267,18 +1283,19 @@ function uploadToImgur(blob, filename) {
 
 
 class Preset {
-  constructor(displayName, manager, data, legend) {
+  constructor(displayName, manager, data, legend, state) {
     this.manager = manager;
     this._displayName = displayName;
-    this.initialize(data, legend);
+    this.initialize(data, legend, state);
     this.locked = manager.storage.defaults
         .presetDisplayNames.includes(displayName);
   }
 
-  initialize(data, legend) {
+  initialize(data, legend, state) {
     const storage = this.manager.storage;
     this._data = data || storage.retrieve(this.internalPresetDataName);
     this._legend = legend || storage.retrieve(this.internalPresetLegendName);
+    this._state = state || storage.retrieve(this.internalPresetStateName) || '';
   }
 
   checkLock() {
@@ -1291,11 +1308,13 @@ class Preset {
   cleanup() {
     this.manager.storage.remove(this.internalPresetDataName);
     this.manager.storage.remove(this.internalPresetLegendName);
+    this.manager.storage.remove(this.internalPresetStateName);
   }
 
   get displayName() {return this._displayName};
   get data() {return this._data};
   get legend() {return this._legend};
+  get state() {return this._state};
   set displayName(value) {
     this.checkLock();
     this.manager.delete(this);
@@ -1305,12 +1324,16 @@ class Preset {
   set data(value) {
     this.checkLock();
     this._data = value;
-    this.manager.save();
+    this.manager.storage.store(this.internalPresetDataName, this.data);
   }
   set legend(value) {
     this.checkLock();
     this._legend = value;
-    this.manager.save();
+    this.manager.storage.store(this.internalPresetLegendName, this.legend);
+  }
+  set state(value) {
+    this._state = value;
+    this.manager.storage.store(this.internalPresetStateName, this.state);
   }
   get name() {
     return toCSSClassName(this.displayName);
@@ -1320,6 +1343,9 @@ class Preset {
   }
   get internalPresetLegendName() {
     return `--legend-${this.name}`;
+  }
+  get internalPresetStateName() {
+    return `--state-${this.name}`;
   }
 }
 
@@ -1351,7 +1377,10 @@ class PresetManager {
     return this.presets.get(name);
   }
 
-  create(displayName, data = '', legend = defaultSettings.legend) {
+  create(displayName,
+         data = defaultSettings.data,
+         legend = defaultSettings.legend,
+         state = defaultSettings.state) {
     const name = toCSSClassName(displayName);
     this.sanitizeInput(name);
     if (this.presets.has(name)) {
@@ -1360,6 +1389,15 @@ class PresetManager {
     const preset = new Preset(displayName, this, data, legend);
     this.presets.set(name, preset);
     this.save();
+  }
+
+  duplicate(displayName, preset) {
+    if (preset) {
+      const {data, legend, state} = preset;
+      this.create(displayName, data, legend, state);
+    } else {
+      this.create(displayName);
+    }
   }
 
   add(preset) {
@@ -1404,7 +1442,6 @@ class PresetManager {
       const errorMessage = `Attempted to select non-existent preset "${name}".`;
       throw new KinklistError(errorMessage);
     }
-    this.save();
   }
 
   apply() {
@@ -1428,6 +1465,7 @@ class PresetManager {
     for (let preset of this.presets.values()) {
       this.storage.store(preset.internalPresetDataName, preset.data);
       this.storage.store(preset.internalPresetLegendName, preset.legend);
+      this.storage.store(preset.internalPresetStateName, preset.state);
     }
     this.storage.store("currentPreset", this.currentPreset.name);
   }
@@ -1441,6 +1479,7 @@ class StorageHandler {
       //presetList: [/* Generated automatically below. */],
       "--preset-default": defaultSettings.data,
       "--legend-default": defaultSettings.legend,
+      "--state-default": defaultSettings.state,
       currentPreset: "default",
     };
     const presetList = this.defaults.presetDisplayNames
@@ -1495,19 +1534,6 @@ function init() {
   const kinklist = new Kinklist(currentPreset);
 
 
-
-  (function() {
-    let lastResize = 0;
-    window.addEventListener("resize", () => {
-      let currentTime = Date.now();
-      lastResize = currentTime;
-      setTimeout(() => {
-        if (currentTime == lastResize) {
-          kinklist.interface.refresh();
-        }
-      }, 150)
-    })
-  })();
 
   const exportButtonElement = document.querySelector(".export-button");
   const exportLinkElement = document.querySelector(".export-link");
@@ -1652,8 +1678,7 @@ function init() {
   function presetCreateButtonEventHandler() {
     const displayName = window.prompt("Enter new preset name:");
     if (displayName) {
-      const {data, legend} = presetManager.get("default");
-      presetManager.create(displayName, data, legend);
+      presetManager.duplicate(displayName);
       const name = toCSSClassName(displayName);
       presetManager.select(name);
       updatePresetOverlayState();
@@ -1672,8 +1697,7 @@ function init() {
   function presetDuplicateButtonEventHandler() {
     const displayName = window.prompt("Enter new preset name:");
     if (displayName) {
-      const {data, legend} = presetManager.selectedPreset;
-      presetManager.create(displayName, data, legend);
+      presetManager.duplicate(displayName, presetManager.selectedPreset);
       const name = toCSSClassName(displayName);
       presetManager.select(name);
       updatePresetOverlayState();
@@ -1697,9 +1721,9 @@ function init() {
       } else throw e;
     }
     presetManager.apply();
-    const data = presetManager.selectedPreset.data;
+    const preset = presetManager.selectedPreset;
     disablePresetControlElements(true);
-    kinklist.data = data;
+    kinklist.preset = preset;
     disablePresetControlElements(false);
     closeOverlayEventHandler(event);
   }
@@ -1760,6 +1784,13 @@ function init() {
         break;
     }
   }
+  function resizeEventHandler() {
+    kinklist.interface.refresh();
+  }
+  function kinklistStateUpdateEventHandler() {
+    const stateKey = presetManager.currentPreset.internalPresetStateName;
+    presetManager.currentPreset.state = kinklist.state;
+  }
 
   Object.entries({
     mousedown: [
@@ -1784,13 +1815,36 @@ function init() {
     change: [
       [presetSelectorElement, presetSelectorElementEventHandler],
     ],
-  }).forEach(([event, elementHandlersArray]) => {
-    elementHandlersArray.forEach(([element, handler]) => {
-      const attachHandler = (e, h) => e.addEventListener(event, h);
-      if (element instanceof NodeList) {
-        element.forEach(e => attachHandler(e, handler));
+    resize: [
+      [window, resizeEventHandler, 150],
+    ],
+    "kinklist-stateUpdate": [
+      [window, kinklistStateUpdateEventHandler, 50],
+    ],
+  }).forEach(([event, attachmentsList]) => {
+    function attachHandler(element, handler, delay)  {
+      if (delay == null) {
+        element.addEventListener(event, handler);
       } else {
-        attachHandler(element, handler);
+        (function() {
+          let lastDispatch = 0;
+          element.addEventListener(event, (e) => {
+            const currentDispatch = Date.now();
+            lastDispatch = currentDispatch;
+            setTimeout(() => {
+              if (currentDispatch == lastDispatch) {
+                handler(e);
+              }
+            }, delay);
+          })
+        })();
+      }
+    }
+    attachmentsList.forEach(([element, handler, delay]) => {
+      if (element instanceof NodeList) {
+        element.forEach(e => attachHandler(e, handler, delay));
+      } else {
+        attachHandler(element, handler, delay);
       }
     });
   })
