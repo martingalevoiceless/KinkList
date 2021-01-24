@@ -406,7 +406,7 @@ class KinklistInterface extends Interface {
   constructor(kinklist) {
     super(kinklist);
     this.hasCategoriesChanged = false;
-    this.element = document.querySelector("#Kinklist");
+    this.element = document.querySelector(".kinklist");
   }
 
   createElement() {
@@ -426,7 +426,7 @@ class KinklistInterface extends Interface {
     });
     const columnElements =
           categoryElements.map(column => createHTMLElement("div", column));
-    const element = createHTMLElement("div#Kinklist", columnElements);
+    const element = createHTMLElement("div.kinklist", columnElements);
     return element;
   }
 
@@ -831,7 +831,7 @@ class KinklistCanvasDrawer {
 
   createCanvas(height = this.settings.canvas.height,
                width = this.settings.canvas.width) {
-    const canvas = createHTMLElement("canvas#KinklistCanvas", null,
+    const canvas = createHTMLElement("canvas.kinklist-canvas", null,
                                      {width: width, height: height});
     canvas.height = height;
     canvas.width = width;
@@ -1066,7 +1066,7 @@ class Carousel {
   constructor(kinklistObject, carouselElement) {
     this.kinklist = kinklistObject;
     this.rootElement = carouselElement
-                       || document.querySelector("#CarouselInput");
+                       || document.querySelector(".carousel.overlay");
     this.initialize(); // this.selections, this.index;
   }
 
@@ -1164,7 +1164,7 @@ class Carousel {
 
   updateInputValues(selection) {
   	const inputValuesElement =
-        this.rootElement.querySelector("#CarouselValues");
+        this.rootElement.querySelector(".values");
   	removeInnerNodes(inputValuesElement);
   	inputValuesElement.append(...this.createInputValues(selection));
   }
@@ -1172,11 +1172,11 @@ class Carousel {
   updateInputCurrentElementState(selection = this.selection) {
   	const kink = selection.kink;
   	const category = kink.category;
-  	this.rootElement.querySelector("#CarouselCategory").textContent =
-  			category.name;
-  	this.rootElement.querySelector("#CarouselKink").textContent = kink.name;
-  	this.rootElement.querySelector("#CarouselColumn")
-        .textContent = selection.columnName;
+  	this.rootElement.querySelector(".current .category").textContent
+        = category.name;
+  	this.rootElement.querySelector(".current .kink").textContent = kink.name;
+  	this.rootElement.querySelector(".current .column").textContent
+        = selection.columnName;
   	const selectedElement = this.rootElement.querySelector(".selected");
   	if (selectedElement) selectedElement.classList.remove("selected");
     if (selection.value) {
@@ -1184,7 +1184,7 @@ class Carousel {
             selection.value.interface.cssClassName;
     	const newSelectedElement =
     			this.rootElement
-              .querySelector(`#CarouselCurrent .${selectionCSSClassName}`)
+              .querySelector(`.current .${selectionCSSClassName}`)
     					.parentElement;
     	newSelectedElement.classList.add("selected");
     }
@@ -1201,7 +1201,7 @@ class Carousel {
   		kinkSimpleDivElements.push(kinkSimpleDivElement);
   	}
   	const inputPreviousElement =
-        this.rootElement.querySelector("#CarouselPrevious");
+        this.rootElement.querySelector(".previous");
   	removeInnerNodes(inputPreviousElement);
   	inputPreviousElement.append(...kinkSimpleDivElements);
   }
@@ -1216,7 +1216,7 @@ class Carousel {
 			});
   		kinkSimpleDivElements.push(kinkSimpleDivElement);
   	}
-  	const inputNextElement = this.rootElement.querySelector("#CarouselNext");
+  	const inputNextElement = this.rootElement.querySelector(".next");
   	removeInnerNodes(inputNextElement);
   	inputNextElement.append(...kinkSimpleDivElements);
   }
@@ -1540,19 +1540,19 @@ function init() {
   const exportLinkElement = document.querySelector(".export-link");
   const generateButtonElement = document.querySelector(".generate-button");
   const loadingElement = document.querySelector(".export-loading");
-  const presetSettingsButtonElement = document.querySelector("#PresetSettingsButton");
-  const presetOverlayElement = document.querySelector("#Presets");
-  const presetSelectorElement = document.querySelector("#PresetSelector");
-  const presetCreateButtonElement = document.querySelector("#PresetCreate");
-  const presetRenameButtonElement = document.querySelector("#PresetRename");
-  const presetDuplicateButtonElement = document.querySelector("#PresetDuplicate");
-  const presetDeleteButtonElement = document.querySelector("#PresetDelete");
-  const presetSaveButtonElement = document.querySelector("#PresetSave");
-  const presetSelectButtonElement = document.querySelector("#PresetSelect");
-  const presetTextareaElement = document.querySelector("#PresetTextarea");
+  const presetSettingsButtonElement = document.querySelector(".preset-settings");
+  const presetOverlayElement = document.querySelector(".presets.overlay");
+  const presetSelectorElement = document.querySelector(".presets select");
+  const presetCreateButtonElement = document.querySelector(".presets .create");
+  const presetRenameButtonElement = document.querySelector(".presets .rename");
+  const presetDuplicateButtonElement = document.querySelector(".presets .duplicate");
+  const presetDeleteButtonElement = document.querySelector(".presets .delete");
+  const presetSaveButtonElement = document.querySelector(".presets .save");
+  const presetSelectButtonElement = document.querySelector(".presets button.select");
+  const presetTextareaElement = document.querySelector(".presets textarea");
   const startButtonElement = document.querySelector(".input-button");
   const resetButtonElement = document.querySelector(".reset-button");
-  const inputOverlayElement = document.querySelector("#CarouselInput");
+  const inputOverlayElement = document.querySelector(".carousel.overlay");
   const closeOverlayButtonElements = document.querySelectorAll(".close-overlay");
   const overlayChildrenElements = document.querySelectorAll(".overlay > *");
   const overlayElements = document.querySelectorAll(".overlay");
@@ -1591,7 +1591,7 @@ function init() {
     if (username) {
       kinklistCanvasDrawer = new KinklistCanvasDrawer(kinklist, username);
       kinklistCanvasDrawer.drawKinklist();
-      const canvasElement = document.querySelector("#KinklistCanvas");
+      const canvasElement = document.querySelector(".kinklist-canvas");
       if (canvasElement) {
         canvasElement.replaceWith(kinklistCanvasDrawer.canvas);
       } else {
@@ -1762,7 +1762,7 @@ function init() {
   }
   function resetButtonEventHandler() {
     kinklist.flush();
-    const kinklistCanvasElement = document.querySelector("#KinklistCanvas");
+    const kinklistCanvasElement = document.querySelector(".kinklist-canvas");
     if (kinklistCanvasElement) {
       kinklistCanvasElement.remove();
     }
@@ -1857,7 +1857,7 @@ function attemptInit() {
     init();
   } catch (error) {
     console.error(error);
-    unhide(document.querySelector("#Error"));
+    unhide(document.querySelector(".error"));
   }
 }
 

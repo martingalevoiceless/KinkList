@@ -11,7 +11,7 @@
 	<body>
 		<div class="contentWrapper widthWrapper body">
 			<header>
-				<div id="Title">
+				<div class="title">
 					<span>Kinklist</span>
 				</div>
 				<div class="export">
@@ -28,19 +28,19 @@
 					<div class="tooltip-container">
 						<button class="settings-button"></button>
 						<div class="menu-tooltip settings-button-tooltip">
-							<button id="PresetSettingsButton">Presets</button>
-							<button id="ExportedImagesEditButton">Exported Images</button>
-							<button id="HelpButton">Help</button>
+							<button class="preset-settings">Presets</button>
+							<button class="exported-images">Exported Images</button>
+							<button class="help">Help</button>
 						</div>
 					</div>
 				</div>
 				<div class="legend"></div>
 			</header>
-			<div id="Error" class="hidden">
+			<div class="error hidden">
 				<p>It seems that there was an error trying to execute the script.</p>
 				<p>You can <a href="https://github.com/MobButcher/KinkList/issues">check if this issue was reported already</a> and try to use <a href="https://rawcdn.githack.com/Goctionni/KinkList/aa4cbd332326eeae6a97369a75bfe75b219de18e/v1.0.2.html">this page</a> instead.</p>
 			</div>
-			<div id="Kinklist"></div>
+			<div class="kinklist"></div>
 			<footer>
 				<p>Original idea by <a target="_blank" rel="noopener noreferrer" href="https://github.com/Goctionni/KinkList">Goctionni</a>.</p>
 				<p>Complete rewrite by MobButcher. <a target="_blank" rel="noopener noreferrer" href="https://twitter.com/MobButcherDev">Twitter</a></p>
@@ -53,41 +53,41 @@
 				<p>Version 2.2.0, released on January 21, 2021.</p>
 			</footer>
 		</div>
-		<div id="CarouselInput" class="overlay hidden">
+		<div class="carousel overlay hidden">
 			<div class="overlay-wrapper">
-				<div id="CarouselPrevious"></div>
-				<div id="CarouselCurrent">
+				<div class="previous"></div>
+				<div class="current">
 					<header>
-						<h2 id="CarouselCategory"></h2>
-						<div id="CarouselSelection">
-							<h3 id="CarouselKink"></h3>
-							<h3 id="CarouselColumn"></h3>
+						<h2 class="category"></h2>
+						<div class="selection">
+							<h3 class="kink"></h3>
+							<h3 class="column"></h3>
 						</div>
 						<button class="close-overlay">&times;</button>
 					</header>
-					<div id="CarouselValues"></div>
+					<div class="values"></div>
 				</div>
-				<div id="CarouselNext"></div>
+				<div class="next"></div>
 			</div>
 		</div>
-		<div id="Presets" class="overlay hidden">
+		<div class="presets overlay hidden">
 			<div class="overlay-wrapper">
 				<div class="preset-background">
 					<div class="preset-header">
-						<select name="preset" id="PresetSelector">
+						<select name="preset">
 							<option disabled>Built-in presets</option>
 							<option value="default">Default</option>
 							<option disabled>Custom presets</option>
 						</select>
 						<button class="close-overlay">&times;</button>
 					</div>
-					<button id="PresetCreate">Create</button>
-					<button id="PresetRename" class="disable-on-default">Rename</button>
-					<button id="PresetDuplicate">Duplicate</button>
-					<button id="PresetDelete" class="disable-on-default">Delete</button>
-					<textarea id="PresetTextarea" class="disable-on-default"></textarea>
-					<button id="PresetSave" class="disable-on-default">Save</button>
-					<button id="PresetSelect">Select</button>
+					<button class="create">Create</button>
+					<button class="rename disable-on-default">Rename</button>
+					<button class="duplicate">Duplicate</button>
+					<button class="delete disable-on-default">Delete</button>
+					<textarea class="disable-on-default"></textarea>
+					<button class="save disable-on-default">Save</button>
+					<button class="select">Select</button>
 				</div>
 			</div>
 		</div>
