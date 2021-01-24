@@ -1121,8 +1121,7 @@ class Carousel {
   			[].concat(...this.kinklist.kinks.map(kink => kink.selections));
   	const oldIndex = this.index || 0;
   	this.index =
-  			this.selections.findIndex(selection =>
-  			     selection.apparentValue.name == "Not Entered");
+  			this.selections.findIndex(selection => selection.value == null);
   	if (this.index == -1) this.index = oldIndex;
     if (this.index >= this.selections.length) this.index = 0;
   	this.previousSelection = this.selection;
