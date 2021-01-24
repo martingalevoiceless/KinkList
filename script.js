@@ -1724,7 +1724,7 @@ function init() {
     const preset = presetManager.selectedPreset;
     disablePresetControlElements(true);
     kinklist.preset = preset;
-    carousel.refresh();
+    if (carousel) carousel.refresh();
     disablePresetControlElements(false);
     closeOverlayEventHandler(event);
   }
