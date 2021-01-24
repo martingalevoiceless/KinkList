@@ -3,21 +3,31 @@ This application allows you to create and share your personal preferences with o
 
 ## Entering preferences
 You can enter your preferences using buttons near each item.
+Pressing on a selection once again would deselect it.
 Additionally, you can enter Edit mode and enter your preferences one at a time: use green button in the upper right corner.
+You can use keyboard to navigate the menu: you can press number key (either on the top row or on a NumPad) to select your kink preference. They are labeled with a corresponding key.
+Additionally, you can press `Up` or `Right` to skip to a next kink. `Down` and `Left` will bring you to the previous one.
 
 ## Resetting your progress
 If you want to start from scratch, use red Reset button to clean all of your selections to default configuration.
 
-## Customizing your list
-Right now you are already able to edit the list to match your desires! Use Settings button in the upper right corner to bring up the configuration panel. In there you can add, modify, replace, and remove categories and entries you want.
+## Presets
+Presets allow you to customize your lists the way you like and have multiple different configurations ready to use. To start using them, hover over or tap on the Settings button in the upper right corner, then select `Presets` from the dropdown.
+By default you have presets supplied at launch, but you can create your own.
+- `Create` button will create a new preset with default configuration.
+- `Duplicate` will duplicate currently selected preset (along with selections of kinks already present).
+- `Rename` allows you to rename a preset you already have.
+- `Delete` a preset if you have to.
+- Don't forget to `Save` your changes. Or you can `Select` the current preset, closing the overlay and start editing it to your desire.
 
-### Syntax
+### Preset syntax
+When creating a new preset, you have a somewhat intuitive way to edit its entries.
 Each category must have a name, columns, and items. Categories must be separated with at least one blank line.
 
 > If you see items enclosed in triangle or square brackets (like this: `<example>`), you have to replace them with the appropriate item. Do not include the brackets themselves.
 
 - `#<Category name>`
-- (`<Column name>[, <Another column name>]...)`
+- `(<Column name>[, <Another column name>]...)`
 - `* <Item name>`
 
 Example:
