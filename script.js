@@ -1384,7 +1384,7 @@ class PresetManager {
     const name = toCSSClassName(displayName);
     this.sanitizeInput(name);
     if (this.presets.has(name)) {
-      throw new KinklistError(`Preset "${name}" already exists.`);
+      throw new KinklistError(`Preset "${preset.name}" already exists.`);
     }
     const preset = new Preset(displayName, this, data, legend);
     this.presets.set(name, preset);
@@ -1404,7 +1404,7 @@ class PresetManager {
     const name = preset.name;
     this.sanitizeInput(name);
     if (this.presets.has(name)) {
-      throw new KinklistError(`Preset "${name}" already exists.`);
+      throw new KinklistError(`Preset "${preset.name}" already exists.`);
     }
     this.presets.set(name, preset);
     this.save();
@@ -1415,7 +1415,7 @@ class PresetManager {
     this.sanitizeInput(preset.name);
     this.sanitizeInput(newName);
     if (this.presets.has(newName)) {
-      throw new KinklistError(`Preset "${name}" already exists.`);
+      throw new KinklistError(`Preset "${preset.name}" already exists.`);
     }
     this.delete(preset);
     this.create(newDisplayName, preset.data, preset.legend);
