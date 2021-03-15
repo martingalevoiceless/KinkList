@@ -1,3 +1,9 @@
+https://rawcdn.githack.com/martingalevoiceless/KinkList/master/index.html
+
+Forked from MobButcher, preset customzied with vr lewding in mind. If you know who I am on discord or don't mind revealing yourself on github, suggestions are welcome. Upstream readme continues:
+
+--------
+
 # Kinklist Editor
 This application allows you to create and share your personal preferences with others. Easily customizable, flexible, and useful.
 

@@ -225,7 +225,310 @@ const defaultSettings = {
     ['Maybe'      , '#DB6C00'],
     ['No'         , '#920000'],
   ],
-  data: "#Bodies\n(General)\n* Skinny\n* Chubby\n* Small breasts\n* Large breasts\n* Small cocks\n* Large cocks\n\n#Clothing\n(Self, Partner)\n* Clothed sex\n* Lingerie\n* Stockings\n* Heels\n* Leather\n* Latex\n* Uniform / costume\n* Cross-dressing\n\n#Groupings\n(General)\n* You and 1 male\n* You and 1 female\n* You and MtF trans\n* You and FtM trans\n* You and 1 male, 1 female\n* You and 2 males\n* You and 2 females\n* Orgy\n\n#General\n(Giving, Receiving)\n* Romance / Affection\n* Handjob / fingering\n* Blowjob\n* Deep throat\n* Swallowing\n* Facials\n* Cunnilingus\n* Face-sitting\n* Edging\n* Teasing\n* JOI, SI\n\n#Ass play\n(Giving, Receiving)\n* Anal toys\n* Anal sex, pegging\n* Rimming\n* Double penetration\n* Anal fisting\n\n#Restrictive\n(Self, Partner)\n* Gag\n* Collar\n* Leash\n* Chastity\n* Bondage (Light)\n* Bondage (Heavy)\n* Encasement\n\n#Toys\n(Self, Partner)\n* Dildos\n* Plugs\n* Vibrators\n* Sounding\n\n#Domination\n(Dominant, Submissive)\n* Dominant / Submissive\n* Domestic servitude\n* Slavery\n* Pet play\n* DD/lg, MD/lb\n* Discipline\n* Begging\n* Forced orgasm\n* Orgasm control\n* Orgasm denial\n* Power exchange\n\n#No consent\n(Aggressor, Target)\n* Non-con / rape\n* Blackmail / coercion\n* Kidnapping\n* Drugs / alcohol\n* Sleep play\n\n#Taboo\n(General)\n* Incest\n* Ageplay\n* Interracial / Raceplay\n* Bestiality\n* Necrophilia\n* Cheating\n* Exhibitionism\n* Voyeurism\n\n#Surrealism\n(Self, Partner)\n* Futanari\n* Furry\n* Vore\n* Transformation\n* Tentacles\n* Monster or Alien\n\n#Fluids\n(General)\n* Blood\n* Watersports\n* Scat\n* Lactation\n* Diapers\n* Cum play\n\n#Degradation\n(Giving, Receiving)\n* Glory hole\n* Name calling\n* Humiliation\n\n#Touch & Stimulation\n(Actor, Subject)\n* Cock/Pussy worship\n* Ass worship\n* Foot play\n* Tickling\n* Sensation play\n* Electro stimulation\n\n#Misc. Fetish\n(Giving, Receiving)\n* Fisting\n* Gangbang\n* Breath play\n* Impregnation\n* Pregnancy\n* Feminization\n* Cuckold / Cuckquean\n\n#Pain\n(Giving, Receiving)\n* Light pain\n* Heavy pain\n* Nipple clamps\n* Clothes pins\n* Caning\n* Flogging\n* Beating\n* Spanking\n* Cock/Pussy slapping\n* Cock/Pussy torture\n* Hot Wax\n* Scratching\n* Biting\n* Cutting",
+  data: `
+#Bodies
+(Self, Partner)
+* Penis
+* Vulva
+* Both at once
+* Boobs
+* Muscular thighs
+* Muscular chest
+* Muscular forearms
+* Facial hair
+* Body hair
+* Pubic Hair
+* Tattoos
+* Piercings
+* Cut Cocks
+* Uncut Cocks
+* Chubby
+* Skinny
+* Furry
+* Monsters
+* Aliens
+* Androids
+
+#Body Sizing
+(Small, Large)
+* Booty
+* Dicks
+* Balls
+* Labia
+* Boobs
+* Pecs
+* Hips
+* Shoulders
+* Waist
+* Body height
+
+#Roles
+(Self, Partners)
+* as Male
+* as Female
+* as Enby
+* as Femboy (amab)/Boi (afab)
+* as Tomboy
+
+#Touch on...
+(Giving, Receiving)
+* Hair
+* Eyes
+* Nose
+* Ears
+* Lips
+* Chin
+* Neck
+* Armpits
+* Breasts
+* Breast/Nipple Worship
+* Nipples
+* Arms
+* Hands
+* Chest
+* Shoulders
+* Back
+* Stomach
+* Genital touch
+* Genital worship
+* Anus
+* Hips
+* Butt
+* Butt worship
+* Thighs
+* Calves
+* Feet
+
+#Groupings
+(General)
+* You and one partner
+* Threesome
+* Group sex (4 or more)
+* Partner swapping
+* Swinging
+* Sex with friends
+* Sex with strangers
+
+#Clothing
+(Self, Partner)
+* Clothed sex
+* Pussy hole in pants
+* Lingerie
+* Heels
+* Leather
+* Latex/rubber
+* Uniforms
+* Form fitting
+* Dresses/skirts
+* Suits
+* Revealing (SFW)
+* Misclothed (NSFW)
+* Socks/Stockings
+
+#Misc
+(General)
+* Condoms
+* Hotdogging
+* Different races
+* Race fetishism
+* Scissoring
+
+#Acts
+(Giving, Receiving)
+* Dirty Talking
+* Romance / Affection
+* Facials
+* Huge facials
+* Vanilla Sex
+* Cuddling
+* Licking
+* Swallowing
+* Face-sitting
+* Emotional support
+* Ice
+* Strip dancing
+* Teasing
+* Kissing
+* Tickling
+* Foreplay
+* Aftercare
+* Edging
+* Face-Fucking
+
+#Vulva specific
+(Giving, Receiving)
+* Pussy Fingering
+* Eating pussy
+* Penetration
+* Double penetration
+* Pussy Fisting
+* G-Spot stimulation
+
+#Penis specific
+(Giving, Receiving)
+* Handjob
+* Sucking dick
+* Deep throat
+* Sounding
+* Docking
+
+#Anal Play
+(Giving, Receiving)
+* Anal Fingering
+* Eating ass
+* Anal sex
+* Pegging
+* Double penetration
+* Anal Fisting
+* Anal toys
+* Buttplugs
+* Prostate massage
+* Prostate orgasms
+* Anal orgasms
+
+#Restrictive
+(Self, Partner)
+* Gag
+* Collar
+* Leash
+* Chastity
+* Bondage (Light)
+* Bondage (Heavy)
+* Rope bondage
+* Encasement
+* Sensory deprivation
+
+#Toys
+(Self, Partner)
+* Dildos
+* Huge dildos
+* Vibrators
+* Fleshlight / Sleeves
+* Suction toys
+* Fucking Machines
+* Remote controlled toys
+* Multi-hour leave-in
+
+#Domination
+(As Dominant, As Submissive)
+* General Dom / General Sub
+* Master / Slave
+* Caregiver / Little
+* Power exchange
+* Full time 24/7
+* Contracts
+* Domestic servitude
+* Brattiness
+* Orgasm control
+* Indefinite denial/Chastity
+* Forced masturbation
+* Forced orgasms
+* Forced nudity
+* Inspections
+
+#Degradation/shame
+(as Dominant, as Submissive)
+* Embarrassment
+* Verbal humiliation
+* sub Begging
+* sub Crying
+* Face slapping
+* Spitting (in mouth)
+* Spitting (on face/body)
+* Name calling
+* Body Writing
+* Objectification
+* Body image humiliation
+
+#Consent
+(Giving, Receiving)
+* Verbal Consent
+* Body Language Based Consent
+* Pre-arranged consent-by-default
+
+#Non-consent (with safeword)
+(As actor, As subject)
+* CNC / forced rape
+* Blackmail / coercion
+* Kidnapping
+* Drugs
+* Alcohol
+* Mind control/hyperobedience
+* Sleep play
+
+#Taboo
+(General)
+* Sexual normalization
+* Incest
+* Age Gap
+* Bestiality
+* Necrophilia
+* Vore
+* Cheating
+* Exhibitionism
+* Voyeurism
+
+#Surrealism
+(Self, Partner)
+* Transformation
+* Cum From Mouth/Nose
+* Excessive Cum
+* Sentient Cocks
+* Knotting/stuck together
+* Cum Inflation (Heavy/Extreme)
+* Cum Inflation (Light/Medium)
+* Tentacles
+* Ghost
+
+#Fluids
+(General)
+* Blood
+* Watersports (urine)
+* Force Feeding
+* Saliva
+* Scat
+* Lactation
+* Diapers
+* Cum
+* Cumlube
+
+#Misc. Fetish
+(Giving, Receiving)
+* Creampie/Impregnation
+* Breeding
+* Pregnancy
+* Breath play
+* Feminization
+* Cuckold / Cuckquean
+* Cum Bath
+* Cum Marking/leave-on
+* Cum Milking
+* Cum on Clothes
+* Premature Ejaculation
+* Snowballing
+* Thick/Sticky Cum
+
+#Pain
+(Giving, Receiving)
+* Light pain
+* Heavy pain
+* Hickeys
+* Marks / Bruises
+* Nipple clamps
+* Clothes pins
+* Caning
+* Flogging
+* Gagging / Choking
+* Beating
+* Spanking
+* Pinching
+* Cock/Pussy slapping
+* Cock/Pussy torture
+* Hot Wax
+* Scratching
+* Biting
+* Cutting
+  `.trim(),
   state: '',
   username: "Anonymous",
 }
